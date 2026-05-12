@@ -222,7 +222,9 @@ function TelegramIcon() {
       aria-hidden="true"
       className="h-[1.08rem] w-[1.08rem]"
       fill="none"
+      height="18"
       viewBox="0 0 24 24"
+      width="18"
     >
       <path
         d="M20.4 4.7 3.9 11.1c-.9.35-.88 1.1-.15 1.32l4.2 1.3 1.6 5.05c.2.58.5.72.95.32l2.3-2.18 4.28 3.14c.78.43 1.33.2 1.52-.72l2.75-12.98c.28-1.12-.43-1.62-.95-1.65Z"
@@ -247,7 +249,9 @@ function WhatsAppIcon() {
       aria-hidden="true"
       className="h-[1.08rem] w-[1.08rem]"
       fill="none"
+      height="18"
       viewBox="0 0 24 24"
+      width="18"
     >
       <path
         d="M5.2 19.05 6.1 16A7.6 7.6 0 1 1 8 17.86l-2.8 1.2Z"
