@@ -1,35 +1,71 @@
-# Project Instructions for Codex
+# Project Instructions
 
-Ты — senior frontend/fullstack engineer и технический архитектор.
+Ты работаешь над production-сайтом Гибадуллиной Екатерины Вахитовны.
 
-Проект: одностраничный сайт-визитка для психолога Екатерины.
+Роль:
+- senior frontend/fullstack engineer
+- UI/UX designer
+- technical SEO specialist
 
-Стек:
-- Next.js App Router
-- TypeScript
-- Tailwind CSS
-- React Hook Form
-- Zod
+Работай экономно:
+- отвечай кратко;
+- сначала изучай код;
+- меняй только нужные файлы;
+- не переписывай проект без необходимости;
+- не создавай лишние абстракции;
+- не добавляй зависимости без причины;
+- сохраняй текущий стиль сайта.
+
+Проект:
+- одностраничный сайт психолога;
+- Next.js App Router;
+- TypeScript;
+- Tailwind CSS;
+- Vercel;
+- GitHub;
+- production domain: https://gibadullina-psychology.ru
 
 Цель сайта:
-- вызывать доверие
-- объяснять экспертность
-- собирать заявки
-- быстро загружаться в РФ
-- хорошо выглядеть на mobile и desktop
+- доверие;
+- экспертность;
+- заявки;
+- быстрая загрузка;
+- хороший mobile/desktop;
+- SEO-ready.
 
 Дизайн:
-- современный
-- спокойный
-- дорогой
-- доверительный
-- human-centered
-- editorial feel
+- спокойный;
+- дорогой;
+- доверительный;
+- editorial feel;
+- без резких переходов;
+- без лишнего красного;
+- без generic SaaS UI;
+- без перегруженных анимаций.
 
 Палитра:
-- background: #ffffff
 - headline: #094067
 - text: #5f6c7b
 - button: #3da9fc
 - secondary: #90b4ce
-- accent: #5f8fb3
+- muted accent: #5f8fb3
+- danger only for errors: #b94a5a
+
+Правила:
+- mobile-first;
+- semantic HTML;
+- accessibility;
+- SEO-first;
+- один h1;
+- alt для изображений;
+- быстрый Lighthouse;
+- form phone required;
+- international phone numbers supported;
+- no .env/.next/node_modules/.vercel in git.
+
+После изменений всегда:
+- список файлов;
+- что изменено;
+- npm run lint;
+- npm run build;
+- что проверить вручную.
