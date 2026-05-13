@@ -37,12 +37,16 @@ jobs:
       - name: Prepare deploy package
         run: |
           set -euo pipefail
-          for name in TELEGRAM_BOT_TOKEN TELEGRAM_CHAT_ID NEXT_PUBLIC_SITE_URL NEXT_PUBLIC_YANDEX_METRIKA_ID; do
+          for name in TELEGRAM_BOT_TOKEN NEXT_PUBLIC_SITE_URL NEXT_PUBLIC_YANDEX_METRIKA_ID; do
             if [ -z "${!name}" ]; then
               echo "::error::$name is not configured"
               exit 1
             fi
           done
+          if [ -z "${TELEGRAM_CHAT_IDS}" ] && [ -z "${TELEGRAM_CHAT_ID}" ]; then
+            echo "::error::TELEGRAM_CHAT_IDS or TELEGRAM_CHAT_ID is not configured"
+            exit 1
+          fi
           mkdir -p deploy-package/.next
           cp -R .next/standalone deploy-package/.next/standalone
           cp -R .next/static deploy-package/.next/static
@@ -54,6 +58,7 @@ jobs:
           cp ecosystem.config.cjs deploy-package/ecosystem.config.cjs
           {
             printf 'TELEGRAM_BOT_TOKEN=%s\n' "$TELEGRAM_BOT_TOKEN"
+            printf 'TELEGRAM_CHAT_IDS=%s\n' "$TELEGRAM_CHAT_IDS"
             printf 'TELEGRAM_CHAT_ID=%s\n' "$TELEGRAM_CHAT_ID"
             printf 'NEXT_PUBLIC_SITE_URL=%s\n' "$NEXT_PUBLIC_SITE_URL"
             printf 'NEXT_PUBLIC_YANDEX_METRIKA_ID=%s\n' "$NEXT_PUBLIC_YANDEX_METRIKA_ID"
@@ -65,6 +70,7 @@ jobs:
           sha256sum "ekat-gib-${GITHUB_SHA}.tar.gz" > "ekat-gib-${GITHUB_SHA}.tar.gz.sha256"
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_IDS: ${{ secrets.TELEGRAM_CHAT_IDS }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           NEXT_PUBLIC_SITE_URL: https://gibadullina-psychology.ru
           NEXT_PUBLIC_YANDEX_METRIKA_ID: ${{ secrets.NEXT_PUBLIC_YANDEX_METRIKA_ID }}

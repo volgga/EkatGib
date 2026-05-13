@@ -11,6 +11,12 @@ type RateLimitRecord = {
   resetAt: number;
 };
 
+class TelegramDeliveryError extends Error {
+  constructor(public status?: number) {
+    super(status ? `Telegram API status ${status}` : "Telegram API request failed");
+  }
+}
+
 const rateLimitStore = new Map<string, RateLimitRecord>();
 
 function sanitizeText(value: string) {
@@ -131,6 +137,45 @@ function formatTelegramMessage(lead: z.infer<typeof leadSchema>) {
   ].join("\n");
 }
 
+function getTelegramChatIds() {
+  const chatIds = process.env.TELEGRAM_CHAT_IDS?.split(",")
+    .map((chatId) => chatId.trim())
+    .filter(Boolean);
+
+  if (chatIds?.length) {
+    return chatIds;
+  }
+
+  return process.env.TELEGRAM_CHAT_ID ? [process.env.TELEGRAM_CHAT_ID] : [];
+}
+
+async function sendTelegramMessage(token: string, chatId: string, text: string) {
+  try {
+    const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text,
+        parse_mode: "HTML",
+        disable_web_page_preview: true,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new TelegramDeliveryError(response.status);
+    }
+  } catch (error) {
+    if (error instanceof TelegramDeliveryError) {
+      throw error;
+    }
+
+    throw new TelegramDeliveryError();
+  }
+}
+
 export async function POST(request: NextRequest) {
   cleanupRateLimits();
 
@@ -159,39 +204,28 @@ export async function POST(request: NextRequest) {
   }
 
   const token = process.env.TELEGRAM_BOT_TOKEN;
-  const chatId = process.env.TELEGRAM_CHAT_ID;
+  const chatIds = getTelegramChatIds();
 
-  if (!token || !chatId) {
+  if (!token || chatIds.length === 0) {
     console.error("Lead submission failed: Telegram env is not configured");
     return NextResponse.json({ error: "Lead service is not configured" }, { status: 500 });
   }
 
-  try {
-    const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        chat_id: chatId,
-        text: formatTelegramMessage(parsed.data),
-        parse_mode: "HTML",
-        disable_web_page_preview: true,
-      }),
+  const message = formatTelegramMessage(parsed.data);
+  const results = await Promise.allSettled(
+    chatIds.map((chatId) => sendTelegramMessage(token, chatId, message)),
+  );
+  const failedResults = results.filter((result) => result.status === "rejected");
+
+  if (failedResults.length > 0) {
+    console.warn("Lead submission: Telegram delivery failed for some chats", {
+      failed: failedResults.length,
+      total: results.length,
     });
+  }
 
-    if (!response.ok) {
-      console.error("Lead submission failed: Telegram API rejected request", {
-        status: response.status,
-      });
-
-      return NextResponse.json({ error: "Lead delivery failed" }, { status: 502 });
-    }
-  } catch (error) {
-    console.error("Lead submission failed: Telegram API request error", {
-      message: error instanceof Error ? error.message : "Unknown error",
-    });
-
+  if (failedResults.length === results.length) {
+    console.error("Lead submission failed: Telegram delivery failed for all chats");
     return NextResponse.json({ error: "Lead delivery failed" }, { status: 502 });
   }
 
