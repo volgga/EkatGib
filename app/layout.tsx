@@ -50,6 +50,9 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  verification: {
+    yandex: "66a21cb447a879c6",
+  },
 };
 
 export default function RootLayout({
