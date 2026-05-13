@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { reachGoal } from "@/lib/metrika";
 import { navItems } from "@/lib/site-data";
 
 const contacts = {
@@ -71,17 +72,18 @@ export function Header() {
           <a
             className="hidden h-10 items-center text-[0.95rem] font-semibold leading-none text-headline/84 transition-colors hover:text-button lg:inline-flex"
             href={contacts.phoneHref}
+            onClick={() => reachGoal("click_phone")}
           >
             {contacts.phone}
           </a>
           <div className="hidden h-10 items-center gap-1 md:flex">
-            <IconLink href={contacts.telegram} label="Написать в Telegram">
+            <IconLink href={contacts.telegram} label="Написать в Telegram" goal="click_telegram">
               <TelegramIcon />
             </IconLink>
-            <IconLink href={contacts.whatsapp} label="Написать в WhatsApp">
+            <IconLink href={contacts.whatsapp} label="Написать в WhatsApp" goal="click_whatsapp">
               <WhatsAppIcon />
             </IconLink>
-            <IconLink href={contacts.max} label="MAX">
+            <IconLink href={contacts.max} label="MAX" goal="click_max">
               <span className="text-[0.58rem] font-bold leading-none tracking-[0.045em] text-headline/76">
                 MAX
               </span>
@@ -90,6 +92,7 @@ export function Header() {
           <a
             className="inline-flex h-10 items-center justify-center rounded-xl bg-[#2f9ff0] px-3 text-sm font-semibold leading-none text-white shadow-[0_8px_24px_rgba(61,169,252,0.20)] transition-all duration-300 ease-out hover:-translate-y-0.5 hover:bg-[#1f94ea] hover:shadow-[0_14px_32px_rgba(61,169,252,0.28)] sm:px-4"
             href="#contact"
+            onClick={() => reachGoal("click_header_cta")}
           >
             <span className="hidden sm:inline">Записаться</span>
             <span className="sm:hidden">Запись</span>
@@ -158,19 +161,25 @@ export function Header() {
             <a
               className="rounded-2xl border border-secondary/20 bg-white/70 px-4 py-3 text-sm font-semibold text-headline transition-colors hover:border-secondary/45"
               href={contacts.phoneHref}
-              onClick={() => setIsMenuOpen(false)}
+              onClick={() => {
+                reachGoal("click_phone");
+                setIsMenuOpen(false);
+              }}
             >
               Телефон
             </a>
-            <MobileContactLink href={contacts.telegram} label="Telegram" />
-            <MobileContactLink href={contacts.whatsapp} label="WhatsApp" />
-            <MobileContactLink href={contacts.max} label="MAX" />
+            <MobileContactLink href={contacts.telegram} label="Telegram" goal="click_telegram" />
+            <MobileContactLink href={contacts.whatsapp} label="WhatsApp" goal="click_whatsapp" />
+            <MobileContactLink href={contacts.max} label="MAX" goal="click_max" />
           </div>
 
           <a
             className="mt-4 inline-flex min-h-12 w-full items-center justify-center rounded-2xl bg-[#2f9ff0] px-5 text-sm font-semibold text-white shadow-[0_10px_28px_rgba(61,169,252,0.22)] transition-all duration-300 ease-out hover:-translate-y-0.5 hover:bg-[#1f94ea] hover:shadow-[0_14px_34px_rgba(61,169,252,0.28)]"
             href="#contact"
-            onClick={() => setIsMenuOpen(false)}
+            onClick={() => {
+              reachGoal("click_header_cta");
+              setIsMenuOpen(false);
+            }}
           >
             Записаться
           </a>
@@ -180,7 +189,15 @@ export function Header() {
   );
 }
 
-function MobileContactLink({ href, label }: { href: string; label: string }) {
+function MobileContactLink({
+  href,
+  label,
+  goal,
+}: {
+  href: string;
+  label: string;
+  goal: string;
+}) {
   return (
     <a
       aria-label={label}
@@ -188,6 +205,7 @@ function MobileContactLink({ href, label }: { href: string; label: string }) {
       href={href}
       rel="noopener noreferrer"
       target="_blank"
+      onClick={() => reachGoal(goal)}
     >
       {label}
     </a>
@@ -197,10 +215,12 @@ function MobileContactLink({ href, label }: { href: string; label: string }) {
 function IconLink({
   href,
   label,
+  goal,
   children,
 }: {
   href: string;
   label: string;
+  goal: string;
   children: React.ReactNode;
 }) {
   return (
@@ -210,6 +230,7 @@ function IconLink({
       href={href}
       rel="noopener noreferrer"
       target="_blank"
+      onClick={() => reachGoal(goal)}
     >
       {children}
     </a>

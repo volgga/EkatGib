@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Nunito_Sans } from "next/font/google";
+import { YandexMetrika } from "@/analytics/YandexMetrika";
 import { siteMetadata, siteUrl } from "@/lib/seo";
+import { structuredData } from "@/lib/schema";
 import "./globals.css";
 
 const nunitoSans = Nunito_Sans({
@@ -57,7 +59,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ru">
-      <body className={nunitoSans.variable}>{children}</body>
+      <body className={nunitoSans.variable}>
+        {structuredData.map((item) => (
+          <script
+            id={`schema-${item["@type"].toLowerCase()}`}
+            key={item["@id"]}
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(item) }}
+          />
+        ))}
+        {children}
+        <YandexMetrika />
+      </body>
     </html>
   );
 }

@@ -127,6 +127,7 @@ export function Reviews() {
   return (
     <section id="reviews" className="section-reveal premium-section-bleed relative scroll-mt-24 overflow-hidden px-5 py-11 md:px-8 md:py-18">
       <div className="absolute left-[-14rem] top-32 h-[28rem] w-[28rem] rounded-full bg-secondary/12 blur-3xl" />
+      <div className="absolute bottom-[-12rem] right-[-16rem] h-[30rem] w-[30rem] rounded-full bg-button/5 blur-3xl" />
       <div className="mx-auto max-w-6xl">
         <div className="max-w-5xl">
           <p className="text-sm font-semibold uppercase tracking-[0.18em] text-secondary">
@@ -237,7 +238,7 @@ export function Reviews() {
 
 function FeaturedReview({ name, text }: { name: string; text: string }) {
   return (
-    <figure className="premium-card rounded-2xl border border-secondary/35 bg-[radial-gradient(circle_at_18%_10%,rgba(144,180,206,0.16),transparent_34%),linear-gradient(145deg,#ffffff_0%,#f7fbff_100%)] p-4 transition-all duration-500 ease-out hover:-translate-y-1 hover:border-secondary/60 md:p-5">
+    <figure className="premium-card rounded-2xl border border-secondary/30 bg-[radial-gradient(circle_at_18%_10%,rgba(144,180,206,0.13),transparent_34%),linear-gradient(145deg,rgba(255,255,255,0.64)_0%,rgba(247,251,255,0.5)_100%)] p-4 transition-all duration-500 ease-out hover:-translate-y-1 hover:border-secondary/55 md:p-5">
       <blockquote className="space-y-2 text-[0.98rem] leading-[1.62] text-text md:text-base">
         {text.split("\n\n").map((paragraph, index, paragraphs) => (
           <p
@@ -267,7 +268,7 @@ function ReviewCard({
   compact?: boolean;
 }) {
   return (
-    <figure className="premium-card break-inside-avoid rounded-2xl border border-border/60 bg-[radial-gradient(circle_at_18%_8%,rgba(144,180,206,0.09),transparent_30%),linear-gradient(145deg,#ffffff_0%,#f7fbff_100%)] p-4 transition-all duration-500 ease-out hover:-translate-y-1 hover:border-secondary/50 md:p-5">
+    <figure className="premium-card break-inside-avoid rounded-2xl border border-border/48 bg-[radial-gradient(circle_at_18%_8%,rgba(144,180,206,0.08),transparent_30%),linear-gradient(145deg,rgba(255,255,255,0.58)_0%,rgba(247,251,255,0.46)_100%)] p-4 transition-all duration-500 ease-out hover:-translate-y-1 hover:border-secondary/48 md:p-5">
       <blockquote className={`${compact ? "space-y-2 text-[0.96rem] leading-6" : "space-y-2.5 text-base leading-7"} text-text`}>
         {text.split("\n\n").map((paragraph, index, paragraphs) => (
           <p key={paragraph}>
@@ -286,7 +287,7 @@ function ReviewCard({
 
 function TrustCard() {
   return (
-    <div className="rounded-2xl border border-secondary/25 bg-[radial-gradient(circle_at_16%_12%,rgba(144,180,206,0.18),transparent_34%),linear-gradient(145deg,#f7fbff_0%,#ffffff_100%)] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.78),0_12px_34px_rgba(9,64,103,0.04)] transition-all duration-500 ease-out hover:-translate-y-1 hover:border-secondary/45 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.86),0_18px_46px_rgba(9,64,103,0.065)] md:p-5">
+    <div className="rounded-2xl border border-secondary/22 bg-[radial-gradient(circle_at_16%_12%,rgba(144,180,206,0.15),transparent_34%),linear-gradient(145deg,rgba(247,251,255,0.56)_0%,rgba(255,255,255,0.48)_100%)] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.68),0_12px_34px_rgba(9,64,103,0.034)] backdrop-blur transition-all duration-500 ease-out hover:-translate-y-1 hover:border-secondary/42 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.78),0_18px_46px_rgba(9,64,103,0.055)] md:p-5">
       <dl className="grid grid-cols-3 gap-3">
         {trustStats.map((stat) => {
           const [value, ...label] = stat.split(" ");

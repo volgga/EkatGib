@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Field, Input, Textarea, inputClassName } from "@/components/ui/field";
 import { contactSchema, type ContactFormValues } from "@/lib/contact-schema";
+import { reachGoal } from "@/lib/metrika";
 
 export function ContactForm() {
   const [sent, setSent] = useState(false);
@@ -23,6 +24,7 @@ export function ContactForm() {
 
   function onSubmit(values: ContactFormValues) {
     console.info("Contact request draft", values);
+    reachGoal("form_submit", { contactMethod: values.contactMethod });
     setSent(true);
     reset({ contactMethod: "whatsapp" });
   }

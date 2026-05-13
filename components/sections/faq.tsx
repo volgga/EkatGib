@@ -12,7 +12,7 @@ export function Faq() {
             <details
               key={item.question}
               open={index === 0}
-              className="group rounded-xl border border-border/70 bg-white/86 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.76),0_12px_34px_rgba(9,64,103,0.025)] backdrop-blur transition-all duration-500 ease-out open:border-secondary/45 open:bg-[linear-gradient(145deg,#ffffff_0%,#f7fbff_100%)] hover:-translate-y-px hover:border-secondary/45 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.84),0_16px_42px_rgba(9,64,103,0.045)] md:p-6"
+              className="group rounded-xl border border-border/58 bg-white/74 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.66),0_12px_34px_rgba(9,64,103,0.022)] backdrop-blur transition-all duration-500 ease-out open:border-secondary/42 open:bg-[linear-gradient(145deg,rgba(255,255,255,0.72)_0%,rgba(247,251,255,0.58)_100%)] hover:-translate-y-px hover:border-secondary/42 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.76),0_16px_42px_rgba(9,64,103,0.04)] md:p-6"
             >
               <summary className="flex cursor-pointer list-none items-start justify-between gap-5 text-left text-lg font-semibold leading-7 text-headline marker:hidden [&::-webkit-details-marker]:hidden">
                 <span>{item.question}</span>

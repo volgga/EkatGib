@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { GoalLink } from "@/components/analytics/GoalLink";
 
 export function Hero() {
   return (
@@ -24,12 +25,13 @@ export function Hero() {
             спокойно, бережно и с вниманием к юридическому контексту конфликта.
           </p>
           <div className="mt-8 hidden flex-col gap-3 md:flex md:flex-row">
-            <a
+            <GoalLink
               className="cta-breathe inline-flex min-h-12 items-center justify-center rounded-lg bg-[#2f9ff0] px-6 text-sm font-semibold text-white shadow-[0_12px_32px_rgba(61,169,252,0.24)] transition-all duration-300 ease-out hover:-translate-y-1 hover:bg-[#1f94ea] hover:shadow-[0_18px_44px_rgba(61,169,252,0.32)]"
               href="#contact"
+              goal="click_hero_cta"
             >
               Записаться на консультацию
-            </a>
+            </GoalLink>
             <a
               className="inline-flex min-h-12 items-center justify-center rounded-lg border border-border/80 bg-white/82 px-6 text-sm font-semibold text-headline shadow-[0_8px_24px_rgba(9,64,103,0.025)] backdrop-blur transition-all duration-300 ease-out hover:-translate-y-0.5 hover:border-secondary hover:bg-surface hover:shadow-[0_12px_30px_rgba(9,64,103,0.045)]"
               href="#areas"
@@ -62,12 +64,13 @@ export function Hero() {
           </div>
         </div>
         <div className="flex flex-col gap-3 md:hidden">
-          <a
+          <GoalLink
             className="cta-breathe inline-flex min-h-12 items-center justify-center rounded-xl bg-[#2f9ff0] px-6 text-sm font-semibold text-white shadow-[0_12px_32px_rgba(61,169,252,0.24)] transition-all duration-300 ease-out hover:-translate-y-0.5 hover:bg-[#1f94ea]"
             href="#contact"
+            goal="click_hero_cta"
           >
             Записаться на консультацию
-          </a>
+          </GoalLink>
           <a
             className="inline-flex min-h-12 items-center justify-center rounded-xl border border-border/80 bg-white/82 px-6 text-sm font-semibold text-headline shadow-[0_8px_24px_rgba(9,64,103,0.025)] transition-all duration-300 ease-out hover:-translate-y-0.5 hover:border-secondary hover:bg-surface"
             href="#areas"
