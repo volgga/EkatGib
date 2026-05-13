@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { reachGoal } from "@/lib/metrika";
 import { navItems } from "@/lib/site-data";
 
@@ -14,7 +14,7 @@ const contacts = {
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [scrollProgress, setScrollProgress] = useState(0);
+  const scrollProgressRef = useRef<HTMLDivElement>(null);
   const headerNavItems = navItems.filter((item) => item.href !== "#contact");
   const mobileNavItems = [
     ...headerNavItems,
@@ -33,12 +33,18 @@ export function Header() {
     let frameId: number | null = null;
 
     function updateScrollState() {
+      const progressBar = scrollProgressRef.current;
+
+      if (!progressBar) {
+        return;
+      }
+
       const scrollTop = window.scrollY;
       const scrollableHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress =
+        scrollableHeight > 0 ? Math.min(Math.max(scrollTop / scrollableHeight, 0), 1) : 0;
 
-      setScrollProgress(
-        scrollableHeight > 0 ? Math.min(Math.max(scrollTop / scrollableHeight, 0), 1) : 0,
-      );
+      progressBar.style.transform = `scaleX(${progress})`;
     }
 
     function scheduleScrollUpdate() {
@@ -145,8 +151,8 @@ export function Header() {
       </div>
       <div className="h-0.5 bg-secondary/12">
         <div
-          className="h-full origin-left bg-[linear-gradient(90deg,rgba(61,169,252,0.25),rgba(61,169,252,0.82),rgba(144,180,206,0.55))] transition-transform duration-75 ease-linear"
-          style={{ transform: `scaleX(${scrollProgress})` }}
+          ref={scrollProgressRef}
+          className="h-full origin-left scale-x-0 bg-[linear-gradient(90deg,rgba(61,169,252,0.25),rgba(61,169,252,0.82),rgba(144,180,206,0.55))] will-change-transform"
         />
       </div>
       <div

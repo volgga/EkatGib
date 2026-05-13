@@ -51,6 +51,7 @@ const trustStats = ["1000+ клиентов", "5.0 оценка", "15 лет п�
 export function Reviews() {
   const [activeSlide, setActiveSlide] = useState(0);
   const [activeSlideHeight, setActiveSlideHeight] = useState<number | null>(null);
+  const [isHeightReady, setIsHeightReady] = useState(false);
   const mobileSlideRefs = useRef<Array<HTMLDivElement | null>>([]);
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
   const featuredReview = testimonials.find((review) => review.featured);
@@ -88,6 +89,7 @@ export function Reviews() {
 
     const updateHeight = () => {
       setActiveSlideHeight(activeElement.offsetHeight);
+      setIsHeightReady(true);
     };
 
     updateHeight();
@@ -103,7 +105,15 @@ export function Reviews() {
   }, [activeSlide]);
 
   function goToMobileSlide(index: number) {
-    setActiveSlide(Math.min(Math.max(index, 0), lastMobileSlideIndex));
+    const nextSlide = Math.min(Math.max(index, 0), lastMobileSlideIndex);
+    const nextElement = mobileSlideRefs.current[nextSlide];
+
+    if (nextElement) {
+      setActiveSlideHeight(nextElement.offsetHeight);
+      setIsHeightReady(true);
+    }
+
+    setActiveSlide(nextSlide);
   }
 
   function handleTouchStart(event: TouchEvent<HTMLDivElement>) {
@@ -153,14 +163,18 @@ export function Reviews() {
         <div className="relative mt-5 lg:hidden">
           <div
             aria-label="Отзывы"
-            className="-mx-5 overflow-hidden px-5 transition-[height] duration-300 ease-out [touch-action:pan-y] motion-reduce:transition-none"
+            className={`-mx-5 overflow-hidden px-5 [touch-action:pan-y] ${
+              isHeightReady
+                ? "transition-[height] duration-300 ease-out motion-reduce:transition-none"
+                : ""
+            }`}
             role="region"
             style={{ height: activeSlideHeight ? `${activeSlideHeight}px` : undefined }}
             onTouchEnd={handleTouchEnd}
             onTouchStart={handleTouchStart}
           >
             <div
-              className="flex items-start transition-transform duration-300 ease-out motion-reduce:transition-none"
+              className="flex items-start transition-transform duration-300 ease-out will-change-transform motion-reduce:transition-none"
               style={{ transform: `translateX(-${activeSlide * 100}%)` }}
             >
               {mobileSlides.map((slide, index) => (
@@ -170,8 +184,8 @@ export function Reviews() {
                     mobileSlideRefs.current[index] = element;
                   }}
                   aria-hidden={activeSlide !== index}
-                  className={`min-w-full transition-all duration-300 ease-out motion-reduce:transition-none ${
-                    activeSlide === index ? "scale-100 opacity-100" : "scale-[0.985] opacity-70"
+                  className={`min-w-full transition-opacity duration-300 ease-out motion-reduce:transition-none ${
+                    activeSlide === index ? "opacity-100" : "opacity-70"
                   }`}
                 >
                   {slide.kind === "featured" ? (
@@ -197,20 +211,24 @@ export function Reviews() {
             >
               ‹
             </button>
-            <div className="flex justify-center gap-2">
-            {mobileSlides.map((slide, index) => (
-              <button
-                key={`${slide.review.name}-dot`}
-                aria-label={`Показать отзыв ${index + 1}`}
-                className={`h-2 rounded-full transition-all duration-300 ${
-                  activeSlide === index
-                    ? "w-6 bg-secondary shadow-[0_0_0_4px_rgba(144,180,206,0.10)]"
-                    : "w-2 bg-secondary/30 hover:bg-secondary/55"
-                }`}
-                type="button"
-                onClick={() => goToMobileSlide(index)}
-              />
-            ))}
+            <div className="flex h-9 items-center justify-center gap-1.5">
+              {mobileSlides.map((slide, index) => (
+                <button
+                  key={`${slide.review.name}-dot`}
+                  aria-label={`Показать отзыв ${index + 1}`}
+                  className="flex h-6 w-6 items-center justify-center rounded-full"
+                  type="button"
+                  onClick={() => goToMobileSlide(index)}
+                >
+                  <span
+                    className={`h-2 rounded-full transition-all duration-300 ease-out ${
+                      activeSlide === index
+                        ? "w-6 bg-secondary shadow-[0_0_0_4px_rgba(144,180,206,0.10)]"
+                        : "w-2 bg-secondary/30"
+                    }`}
+                  />
+                </button>
+              ))}
             </div>
             <button
               aria-label="Следующий отзыв"

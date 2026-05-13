@@ -27,6 +27,7 @@ export function Faq() {
               >
                 <button
                   aria-expanded={isOpen}
+                  aria-controls={`faq-answer-${index}`}
                   className="flex w-full cursor-pointer items-start justify-between gap-5 text-left text-lg font-semibold leading-7 text-headline"
                   type="button"
                   onClick={() => {
@@ -51,13 +52,14 @@ export function Faq() {
                   </span>
                 </button>
                 <div
-                  className={`grid transition-[grid-template-rows] duration-[260ms] ease-out motion-reduce:transition-none ${
+                  id={`faq-answer-${index}`}
+                  className={`grid transition-[grid-template-rows] duration-[280ms] ease-out motion-reduce:transition-none ${
                     isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
                   }`}
                 >
-                  <div className="overflow-hidden">
+                  <div className="min-h-0 overflow-hidden">
                     <p
-                      className={`mt-3 max-w-[39rem] leading-7 text-text transition-all duration-[260ms] ease-out motion-reduce:transition-none ${
+                      className={`max-w-[39rem] pt-3 leading-7 text-text transition-all duration-[280ms] ease-out motion-reduce:transition-none ${
                         isOpen ? "translate-y-0 opacity-100" : "-translate-y-1 opacity-0"
                       }`}
                     >
