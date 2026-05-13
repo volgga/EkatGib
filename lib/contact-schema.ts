@@ -16,6 +16,7 @@ export const contactSchema = z.object({
     }),
   contactMethod: z.enum(["phone", "whatsapp", "telegram", "max"]),
   message: z.string().min(10, "Коротко опишите ситуацию"),
+  company: z.string().max(0).optional(),
 });
 
 export type ContactFormValues = z.infer<typeof contactSchema>;

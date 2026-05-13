@@ -8,8 +8,19 @@ import { Field, Input, Textarea, inputClassName } from "@/components/ui/field";
 import { contactSchema, type ContactFormValues } from "@/lib/contact-schema";
 import { reachGoal } from "@/lib/metrika";
 
+type SubmitStatus =
+  | {
+      type: "success";
+      message: string;
+    }
+  | {
+      type: "error";
+      message: string;
+    }
+  | null;
+
 export function ContactForm() {
-  const [sent, setSent] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<SubmitStatus>(null);
   const {
     register,
     handleSubmit,
@@ -22,15 +33,59 @@ export function ContactForm() {
     },
   });
 
-  function onSubmit(values: ContactFormValues) {
-    console.info("Contact request draft", values);
+  async function onSubmit(values: ContactFormValues) {
+    setSubmitStatus(null);
+
+    let response: Response;
+
+    try {
+      response = await fetch("/api/lead", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: values.name,
+          phone: values.phone,
+          message: values.message,
+          source: `contact_form:${values.contactMethod}`,
+          company: values.company || "",
+        }),
+      });
+    } catch {
+      setSubmitStatus({
+        type: "error",
+        message: "Не удалось отправить заявку. Попробуйте ещё раз или напишите напрямую.",
+      });
+      return;
+    }
+
+    if (!response.ok) {
+      setSubmitStatus({
+        type: "error",
+        message: "Не удалось отправить заявку. Попробуйте ещё раз или напишите напрямую.",
+      });
+      return;
+    }
+
     reachGoal("form_submit", { contactMethod: values.contactMethod });
-    setSent(true);
-    reset({ contactMethod: "whatsapp" });
+    setSubmitStatus({
+      type: "success",
+      message: "Заявка отправлена. Екатерина свяжется с вами в ближайшее время.",
+    });
+    reset({ contactMethod: "whatsapp", company: "" });
   }
 
   return (
     <form className="grid gap-5" onSubmit={handleSubmit(onSubmit)} noValidate>
+      <input
+        aria-hidden="true"
+        autoComplete="off"
+        className="hidden"
+        tabIndex={-1}
+        type="text"
+        {...register("company")}
+      />
       <Field label="Имя" error={errors.name?.message}>
         <Input autoComplete="name" placeholder="Как к вам обращаться" {...register("name")} />
       </Field>
@@ -62,15 +117,22 @@ export function ContactForm() {
       </Field>
       <div className="grid gap-2">
         <Button className="rounded-xl" disabled={isSubmitting} type="submit">
-          Отправить заявку
+          {isSubmitting ? "Отправляем..." : "Отправить заявку"}
         </Button>
         <p className="text-center text-xs font-medium text-text/70">
           Первый ответ — без обязательств
         </p>
       </div>
-      {sent ? (
-        <p className="rounded-lg bg-surface px-4 py-3 text-sm text-headline" role="status">
-          Заявка подготовлена. Интеграция с Telegram будет подключена позже.
+      {submitStatus ? (
+        <p
+          className={`rounded-lg px-4 py-3 text-sm ${
+            submitStatus.type === "success"
+              ? "bg-surface text-headline"
+              : "bg-danger/10 text-danger"
+          }`}
+          role={submitStatus.type === "success" ? "status" : "alert"}
+        >
+          {submitStatus.message}
         </p>
       ) : null}
     </form>
