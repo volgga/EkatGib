@@ -6,8 +6,8 @@ on:
       - main
 
 jobs:
-  checks:
-    name: Lint and build
+  deploy:
+    name: Build and deploy
     runs-on: ubuntu-latest
 
     steps:
@@ -31,12 +31,19 @@ jobs:
         env:
           NEXT_PUBLIC_SITE_URL: https://gibadullina-psychology.ru
 
-  deploy:
-    name: Deploy to VPS
-    runs-on: ubuntu-latest
-    needs: checks
+      - name: Prepare deploy package
+        run: |
+          mkdir -p deploy-package/.next
+          cp -R .next/standalone deploy-package/.next/standalone
+          cp -R .next/static deploy-package/.next/static
+          cp -R public deploy-package/public
+          mkdir -p deploy-package/.next/standalone/.next
+          cp -R .next/static deploy-package/.next/standalone/.next/static
+          cp -R public deploy-package/.next/standalone/public
+          cp package.json deploy-package/package.json
+          cp ecosystem.config.cjs deploy-package/ecosystem.config.cjs
+          tar -czf deploy-package.tar.gz -C deploy-package .
 
-    steps:
       - name: Configure SSH
         run: |
           mkdir -p ~/.ssh
@@ -45,7 +52,17 @@ jobs:
           chmod 600 ~/.ssh/deploy_key
           ssh-keyscan -H "${{ secrets.VPS_HOST }}" >> ~/.ssh/known_hosts
 
-      - name: Deploy over SSH
+      - name: Upload deploy package
+        run: |
+          scp \
+            -i ~/.ssh/deploy_key \
+            -o ServerAliveInterval=30 \
+            -o ServerAliveCountMax=10 \
+            -o ConnectTimeout=60 \
+            deploy-package.tar.gz \
+            "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/tmp/ekat-gib.tar.gz"
+
+      - name: Activate on VPS
         run: |
           ssh \
             -i ~/.ssh/deploy_key \
@@ -54,13 +71,9 @@ jobs:
             -o ConnectTimeout=60 \
             "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}" <<'EOF'
             set -e
+            mkdir -p /var/www/ekat-gib
+            tar -xzf /tmp/ekat-gib.tar.gz -C /var/www/ekat-gib
             cd /var/www/ekat-gib
-            git pull origin main
-            npm ci
-            NEXT_PUBLIC_SITE_URL=https://gibadullina-psychology.ru npm run build
-            cp -r public .next/standalone/public
-            mkdir -p .next/standalone/.next
-            cp -r .next/static .next/standalone/.next/static
-            pm2 reload ekat-gib || pm2 restart ekat-gib
+            pm2 reload ekat-gib || pm2 start ecosystem.config.cjs --env production
             pm2 save
           EOF
