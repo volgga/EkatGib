@@ -15,9 +15,7 @@ const pillars = [
 
 export function Approach() {
   return (
-    <section id="approach" className="section-reveal relative scroll-mt-24 overflow-hidden px-5 py-12 md:px-8 md:py-18">
-      <div className="absolute left-[-14rem] bottom-[-18rem] h-[32rem] w-[32rem] rounded-full bg-secondary/12 blur-3xl" />
-      <div className="absolute right-[-18rem] top-[-14rem] h-[34rem] w-[34rem] rounded-full bg-button/5 blur-3xl" />
+    <section id="approach" className="section-reveal relative scroll-mt-24 px-5 py-12 md:px-8 md:py-18">
       <div className="mx-auto max-w-6xl">
         <div className="grid gap-10 md:grid-cols-[0.95fr_1.05fr] md:items-start lg:gap-18">
           <div className="max-w-[36rem] md:pt-3">

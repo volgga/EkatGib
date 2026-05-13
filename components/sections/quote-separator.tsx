@@ -4,8 +4,7 @@ type QuoteSeparatorProps = {
 
 export function QuoteSeparator({ children }: QuoteSeparatorProps) {
   return (
-    <section className="section-reveal relative -mt-1 overflow-hidden px-5 py-8 md:px-8 md:py-14">
-      <div className="absolute inset-x-0 top-1/2 h-24 -translate-y-1/2 bg-[radial-gradient(ellipse_at_center,rgba(144,180,206,0.12),transparent_66%)]" />
+    <section className="section-reveal relative -mt-1 px-5 py-8 md:px-8 md:py-14">
       <div className="relative mx-auto max-w-5xl overflow-hidden rounded-2xl border border-secondary/16 bg-[radial-gradient(circle_at_16%_18%,rgba(144,180,206,0.15),transparent_34%),linear-gradient(135deg,rgba(255,255,255,0.66)_0%,rgba(247,251,255,0.58)_58%,rgba(234,243,248,0.5)_100%)] px-5 py-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.66),0_18px_58px_rgba(9,64,103,0.035)] backdrop-blur-xl md:px-10 md:py-9">
         <div className="absolute -right-24 -top-28 h-64 w-64 rounded-full bg-secondary/14 blur-3xl" />
         <p className="relative max-w-4xl text-[1.42rem] font-semibold leading-snug text-headline md:text-[2rem] md:leading-tight">

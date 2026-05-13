@@ -8,8 +8,7 @@ export function Faq() {
   const [openIndex, setOpenIndex] = useState(0);
 
   return (
-    <section id="faq" className="section-reveal relative scroll-mt-24 overflow-hidden px-5 pb-12 pt-4 md:px-8 md:pb-16 md:pt-6">
-      <div className="absolute left-[-16rem] bottom-[-18rem] h-[30rem] w-[30rem] rounded-full bg-secondary/10 blur-3xl" />
+    <section id="faq" className="section-reveal relative scroll-mt-24 px-5 pb-12 pt-4 md:px-8 md:pb-16 md:pt-6">
       <div className="relative mx-auto max-w-3xl">
         <SectionHeading eyebrow="FAQ" title="Частые вопросы перед первой встречей" />
         <div className="mt-7 grid gap-3 md:mt-8">

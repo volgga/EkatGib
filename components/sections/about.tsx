@@ -1,4 +1,7 @@
+"use client";
+
 import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
 import { SectionHeading } from "@/components/sections/section-heading";
 
 const aboutAreas = [
@@ -21,22 +24,100 @@ const workResults = [
   "Более 500 клиентов, прошедших через сложные жизненные периоды с опорой и поддержкой",
 ];
 
+const educationChips = [
+  "Семейная психология",
+  "Социальная психология",
+  "Юридическая психология",
+  "Медиация",
+  "Педагогическая психология",
+];
+
 export function About() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const imageFrameRef = useRef<HTMLDivElement>(null);
+  const [imageOffset, setImageOffset] = useState<number | null>(null);
+
+  useEffect(() => {
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const desktop = window.matchMedia("(min-width: 768px)");
+    let frameId: number | null = null;
+    let latestOffset: number | null = null;
+
+    function updateImageMotion() {
+      frameId = null;
+      const section = sectionRef.current;
+
+      if (!section || reduceMotion.matches || !desktop.matches) {
+        latestOffset = null;
+        setImageOffset(null);
+
+        return;
+      }
+
+      const rect = section.getBoundingClientRect();
+      const viewportCenter = window.innerHeight * 0.52;
+      const elementCenter = rect.top + rect.height / 2;
+      const range = rect.height / 2 + viewportCenter;
+      const distance = range > 0 ? (elementCenter - viewportCenter) / range : 0;
+      const nextOffset = Math.round(Math.max(Math.min(distance, 1), -1) * -14);
+
+      if (latestOffset !== nextOffset) {
+        latestOffset = nextOffset;
+        setImageOffset(nextOffset);
+      }
+    }
+
+    function scheduleImageMotion() {
+      if (frameId !== null) {
+        return;
+      }
+
+      frameId = window.requestAnimationFrame(updateImageMotion);
+    }
+
+    updateImageMotion();
+    window.addEventListener("scroll", scheduleImageMotion, { passive: true });
+    window.addEventListener("resize", scheduleImageMotion);
+    reduceMotion.addEventListener("change", scheduleImageMotion);
+    desktop.addEventListener("change", scheduleImageMotion);
+
+    return () => {
+      if (frameId !== null) {
+        window.cancelAnimationFrame(frameId);
+      }
+
+      window.removeEventListener("scroll", scheduleImageMotion);
+      window.removeEventListener("resize", scheduleImageMotion);
+      reduceMotion.removeEventListener("change", scheduleImageMotion);
+      desktop.removeEventListener("change", scheduleImageMotion);
+    };
+  }, []);
+
   return (
-    <section id="about" className="section-reveal relative scroll-mt-24 overflow-hidden px-5 py-12 md:px-8 md:pb-24 md:pt-20">
-      <div className="absolute left-[-18rem] top-24 h-[34rem] w-[34rem] rounded-full bg-button/5 blur-3xl" />
-      <div className="absolute right-[-20rem] bottom-[-16rem] h-[34rem] w-[34rem] rounded-full bg-secondary/10 blur-3xl" />
+    <section
+      ref={sectionRef}
+      id="about"
+      className="section-reveal relative scroll-mt-24 px-5 py-12 md:px-8 md:pb-24 md:pt-20"
+    >
       <div className="mx-auto max-w-6xl">
         <SectionHeading eyebrow="Обо мне" title="Профессиональная помощь в период, когда семье трудно говорить спокойно" />
         <div className="mt-10 grid gap-10 md:grid-cols-[0.82fr_1.18fr] md:items-start lg:gap-14">
           <div className="md:sticky md:top-28">
-            <div className="group relative aspect-[4/5] min-h-[280px] overflow-hidden rounded-2xl bg-surface shadow-[0_22px_72px_rgba(9,64,103,0.09)] ring-1 ring-white/70 transition-transform duration-700 ease-out motion-safe:hover:-translate-y-1 motion-safe:hover:scale-[1.006] md:min-h-[400px]">
+            <div
+              ref={imageFrameRef}
+              className="group relative aspect-[4/5] min-h-[280px] overflow-hidden rounded-2xl bg-surface shadow-[0_22px_72px_rgba(9,64,103,0.09)] ring-1 ring-white/70 transition-transform duration-700 ease-out motion-safe:hover:-translate-y-1 motion-safe:hover:scale-[1.006] md:min-h-[400px]"
+            >
               <Image
                 src="/images/ekaterina-hero.webp"
                 alt="Гибадуллина Екатерина Вахитовна, семейный психолог"
                 fill
                 sizes="(min-width: 768px) 22rem, calc(100vw - 2.5rem)"
-                className="object-cover object-[50%_28%] transition-transform duration-700 ease-out motion-safe:group-hover:scale-[1.025]"
+                className="object-cover object-[50%_28%] transition-transform duration-300 ease-out will-change-transform max-md:!transform-none motion-reduce:!transform-none md:scale-[1.035]"
+                style={
+                  imageOffset === null
+                    ? undefined
+                    : { transform: `translate3d(0, ${imageOffset}px, 0) scale(1.035)` }
+                }
               />
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_24%,rgba(255,255,255,0)_0%,rgba(255,255,255,0)_54%,rgba(9,64,103,0.08)_100%),linear-gradient(180deg,rgba(255,255,255,0.06)_0%,rgba(255,255,255,0)_48%,rgba(255,255,255,0.42)_100%)]" />
               <div className="absolute bottom-5 left-5 rounded-full border border-white/75 bg-white/72 px-4 py-2 shadow-sm backdrop-blur-md">
@@ -62,10 +143,25 @@ export function About() {
                 — особенно там, где конфликт уже влияет на отношения, детей и
                 эмоциональное состояние семьи.
               </p>
-              <p className="mt-5 rounded-xl border border-secondary/25 bg-[linear-gradient(135deg,#ffffff_0%,#f7fbff_100%)] px-4 py-3 text-sm font-medium leading-6 text-text shadow-[0_12px_32px_rgba(9,64,103,0.035)]">
-                <span className="font-semibold text-headline">Образование:</span>{" "}
-                педагог-психолог, социальный педагог, социальный психолог, юрист.
-              </p>
+              <div className="mt-5 rounded-xl border border-secondary/25 bg-white/62 px-4 py-4 text-sm leading-6 text-text shadow-[0_12px_32px_rgba(9,64,103,0.03)] backdrop-blur">
+                <p className="font-semibold text-headline">Образование и квалификация</p>
+                <p className="mt-2">
+                  Высшее психологическое образование, специалитет по направлению
+                  «Психология». Дополнительная профессиональная подготовка: семейная
+                  психология, социальная психология, юридическая/криминальная
+                  психология и медиация.
+                </p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {educationChips.map((chip) => (
+                    <span
+                      key={chip}
+                      className="rounded-full border border-secondary/20 bg-white/58 px-3 py-1 text-xs font-semibold leading-5 text-headline/82"
+                    >
+                      {chip}
+                    </span>
+                  ))}
+                </div>
+              </div>
             </div>
             <div>
               <h3 className="text-2xl font-semibold text-headline">

@@ -17,9 +17,7 @@ const pricingOptions = [
 
 export function Pricing() {
   return (
-    <section id="pricing" className="section-reveal relative scroll-mt-24 overflow-hidden px-5 py-10 md:px-8 md:py-16">
-      <div className="absolute right-[-16rem] top-24 h-[32rem] w-[32rem] rounded-full bg-secondary/14 blur-3xl" />
-      <div className="absolute left-[-18rem] top-[-12rem] h-[34rem] w-[34rem] rounded-full bg-button/5 blur-3xl" />
+    <section id="pricing" className="section-reveal relative scroll-mt-24 px-5 py-10 md:px-8 md:py-16">
       <div className="mx-auto max-w-6xl">
         <h2 className="mx-auto max-w-3xl text-center text-3xl font-semibold leading-tight text-headline md:text-4xl">
           Форматы консультаций

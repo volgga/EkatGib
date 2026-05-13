@@ -15,7 +15,7 @@ export default function Home() {
   return (
     <div className="site-canvas min-h-screen">
       <Header />
-      <main className="relative z-0 overflow-hidden">
+      <main className="relative z-0 overflow-x-clip">
         <Hero />
         <About />
         <Areas />

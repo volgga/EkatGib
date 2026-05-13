@@ -2,8 +2,7 @@ import { ContactForm } from "@/components/sections/contact-form";
 
 export function Contact() {
   return (
-    <section id="contact" className="section-reveal relative scroll-mt-24 overflow-hidden px-5 py-10 md:px-8 md:pb-12 md:pt-16">
-      <div className="absolute bottom-[-16rem] right-[-14rem] h-[30rem] w-[30rem] rounded-full bg-button/8 blur-3xl" />
+    <section id="contact" className="section-reveal relative scroll-mt-24 px-5 py-10 md:px-8 md:pb-12 md:pt-16">
       <div className="relative mx-auto grid max-w-6xl gap-10 md:grid-cols-[0.9fr_1.1fr] md:items-start">
         <div>
           <h2 className="text-3xl font-semibold leading-tight text-headline md:text-4xl">
