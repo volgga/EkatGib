@@ -15,7 +15,7 @@ const pricingOptions = [
 
 export function Pricing() {
   return (
-    <section id="pricing" className="section-reveal premium-section-bleed relative scroll-mt-24 overflow-hidden bg-[radial-gradient(circle_at_86%_20%,rgba(144,180,206,0.14),transparent_28rem),linear-gradient(180deg,#f7fbff_0%,#ffffff_30%,#fbfdff_74%,#f7fbff_100%)] px-5 py-11 md:px-8 md:py-22">
+    <section id="pricing" className="section-reveal premium-section-bleed relative scroll-mt-24 overflow-hidden px-5 py-11 md:px-8 md:py-22">
       <div className="absolute right-[-16rem] top-24 h-[32rem] w-[32rem] rounded-full bg-secondary/14 blur-3xl" />
       <div className="mx-auto max-w-6xl">
         <h2 className="mx-auto max-w-3xl text-center text-3xl font-semibold leading-tight text-headline md:text-4xl">

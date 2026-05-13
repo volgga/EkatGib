@@ -125,7 +125,7 @@ export function Reviews() {
   }
 
   return (
-    <section id="reviews" className="section-reveal premium-section-bleed relative scroll-mt-24 overflow-hidden bg-[radial-gradient(circle_at_10%_16%,rgba(144,180,206,0.14),transparent_28rem),radial-gradient(circle_at_88%_74%,rgba(61,169,252,0.06),transparent_24rem),linear-gradient(180deg,#f3f9fc_0%,#ffffff_26%,#fbfdff_72%,#f7fbff_100%)] px-5 py-11 md:px-8 md:py-18">
+    <section id="reviews" className="section-reveal premium-section-bleed relative scroll-mt-24 overflow-hidden px-5 py-11 md:px-8 md:py-18">
       <div className="absolute left-[-14rem] top-32 h-[28rem] w-[28rem] rounded-full bg-secondary/12 blur-3xl" />
       <div className="mx-auto max-w-6xl">
         <div className="max-w-5xl">

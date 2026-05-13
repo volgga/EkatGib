@@ -15,8 +15,9 @@ const pillars = [
 
 export function Approach() {
   return (
-    <section id="approach" className="section-reveal relative scroll-mt-24 overflow-hidden bg-[linear-gradient(180deg,#ffffff_0%,#fbfdff_54%,#f7fbff_100%)] px-5 py-12 md:px-8 md:py-18">
+    <section id="approach" className="section-reveal relative scroll-mt-24 overflow-hidden px-5 py-12 md:px-8 md:py-18">
       <div className="absolute left-[-14rem] bottom-[-18rem] h-[32rem] w-[32rem] rounded-full bg-secondary/12 blur-3xl" />
+      <div className="absolute right-[-18rem] top-[-14rem] h-[34rem] w-[34rem] rounded-full bg-button/5 blur-3xl" />
       <div className="mx-auto max-w-6xl">
         <div className="grid gap-10 md:grid-cols-[0.95fr_1.05fr] md:items-start lg:gap-18">
           <div className="max-w-[36rem] md:pt-3">
@@ -39,7 +40,7 @@ export function Approach() {
               {pillars.map((pillar, index) => (
                 <article
                   key={pillar.title}
-                  className={`relative rounded-2xl bg-[linear-gradient(135deg,#ffffff_0%,#f7fbff_100%)] px-5 py-4.5 shadow-[0_12px_34px_rgba(9,64,103,0.035)] ring-1 ring-border/35 transition-all duration-300 hover:-translate-y-px hover:ring-secondary/35 md:w-[80%] ${
+                  className={`relative rounded-2xl bg-[linear-gradient(135deg,rgba(255,255,255,0.64)_0%,rgba(247,251,255,0.5)_100%)] px-5 py-4.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.62),0_12px_34px_rgba(9,64,103,0.03)] ring-1 ring-border/28 backdrop-blur-xl transition-all duration-300 hover:-translate-y-px hover:ring-secondary/35 md:w-[80%] ${
                     index === 0
                       ? "md:mr-auto"
                       : index === 1

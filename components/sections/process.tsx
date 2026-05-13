@@ -15,7 +15,7 @@ const processSteps = [
 
 export function Process() {
   return (
-    <section className="section-reveal relative overflow-hidden bg-[radial-gradient(circle_at_18%_20%,rgba(144,180,206,0.20),transparent_32%),linear-gradient(180deg,#f7fbff_0%,#ffffff_50%,#f3f9fc_100%)] px-5 py-12 md:px-8 md:py-24">
+    <section className="section-reveal relative overflow-hidden px-5 py-12 md:px-8 md:py-24">
       <div className="absolute left-[-16rem] top-14 h-[30rem] w-[30rem] rounded-full bg-secondary/16 blur-3xl" />
       <div className="absolute bottom-[-18rem] right-[-14rem] h-[30rem] w-[30rem] rounded-full bg-button/8 blur-3xl" />
       <div className="relative mx-auto max-w-6xl">

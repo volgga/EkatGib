@@ -3,7 +3,7 @@ import { faq } from "@/lib/site-data";
 
 export function Faq() {
   return (
-    <section id="faq" className="section-reveal premium-section-bleed relative scroll-mt-24 overflow-hidden bg-[radial-gradient(circle_at_86%_16%,rgba(144,180,206,0.14),transparent_30rem),linear-gradient(180deg,#f7fbff_0%,#ffffff_58%,#fbfdff_100%)] px-5 py-11 md:px-8 md:py-20">
+    <section id="faq" className="section-reveal premium-section-bleed relative scroll-mt-24 overflow-hidden px-5 py-11 md:px-8 md:py-20">
       <div className="absolute left-[-16rem] bottom-[-18rem] h-[30rem] w-[30rem] rounded-full bg-secondary/10 blur-3xl" />
       <div className="relative mx-auto max-w-3xl">
         <SectionHeading eyebrow="FAQ" title="Частые вопросы перед первой встречей" />

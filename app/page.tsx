@@ -13,9 +13,9 @@ import { Reviews } from "@/components/sections/reviews";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_78%_4%,rgba(144,180,206,0.13),transparent_28rem),linear-gradient(180deg,#ffffff_0%,#fbfdff_34%,#ffffff_100%)]">
+    <div className="site-canvas min-h-screen">
       <Header />
-      <main>
+      <main className="relative z-0 overflow-hidden">
         <Hero />
         <About />
         <Areas />

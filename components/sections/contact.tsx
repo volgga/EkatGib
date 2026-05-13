@@ -2,7 +2,7 @@ import { ContactForm } from "@/components/sections/contact-form";
 
 export function Contact() {
   return (
-    <section id="contact" className="section-reveal premium-section-bleed relative scroll-mt-24 overflow-hidden bg-[radial-gradient(circle_at_14%_18%,rgba(144,180,206,0.14),transparent_32rem),radial-gradient(circle_at_90%_86%,rgba(61,169,252,0.08),transparent_26rem),linear-gradient(180deg,#fbfdff_0%,#ffffff_22%,#f7fbff_100%)] px-5 py-11 md:px-8 md:py-24">
+    <section id="contact" className="section-reveal premium-section-bleed relative scroll-mt-24 overflow-hidden px-5 py-11 md:px-8 md:py-24">
       <div className="absolute bottom-[-16rem] right-[-14rem] h-[30rem] w-[30rem] rounded-full bg-button/8 blur-3xl" />
       <div className="relative mx-auto grid max-w-6xl gap-10 md:grid-cols-[0.9fr_1.1fr] md:items-start">
         <div>

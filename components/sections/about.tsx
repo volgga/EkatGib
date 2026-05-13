@@ -23,7 +23,9 @@ const workResults = [
 
 export function About() {
   return (
-    <section id="about" className="section-reveal scroll-mt-24 bg-[linear-gradient(180deg,#f7fbff_0%,#ffffff_28%,#ffffff_76%,#fbfdff_100%)] px-5 py-12 md:px-8 md:pb-24 md:pt-20">
+    <section id="about" className="section-reveal relative scroll-mt-24 overflow-hidden px-5 py-12 md:px-8 md:pb-24 md:pt-20">
+      <div className="absolute left-[-18rem] top-24 h-[34rem] w-[34rem] rounded-full bg-button/5 blur-3xl" />
+      <div className="absolute right-[-20rem] bottom-[-16rem] h-[34rem] w-[34rem] rounded-full bg-secondary/10 blur-3xl" />
       <div className="mx-auto max-w-6xl">
         <SectionHeading eyebrow="Обо мне" title="Профессиональная помощь в период, когда семье трудно говорить спокойно" />
         <div className="mt-10 grid gap-10 md:grid-cols-[0.82fr_1.18fr] md:items-start lg:gap-14">

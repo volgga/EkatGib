@@ -26,8 +26,9 @@ const secondaryRequests = [
 
 export function Areas() {
   return (
-    <section id="areas" className="section-reveal premium-section-bleed relative -mt-3 scroll-mt-24 overflow-hidden bg-[radial-gradient(circle_at_8%_18%,rgba(144,180,206,0.16),transparent_30rem),radial-gradient(circle_at_92%_58%,rgba(61,169,252,0.07),transparent_26rem),linear-gradient(180deg,#f8fcff_0%,#f7fbff_48%,#ffffff_100%)] px-5 py-11 md:-mt-6 md:px-8 md:py-22">
+    <section id="areas" className="section-reveal premium-section-bleed relative -mt-3 scroll-mt-24 overflow-hidden px-5 py-11 md:-mt-6 md:px-8 md:py-22">
       <div className="absolute right-[-14rem] top-28 h-[30rem] w-[30rem] rounded-full bg-secondary/14 blur-3xl" />
+      <div className="absolute left-[-18rem] bottom-[-14rem] h-[34rem] w-[34rem] rounded-full bg-button/6 blur-3xl" />
       <div className="mx-auto max-w-6xl">
         <div className="relative max-w-4xl">
           <h2 className="text-2xl font-semibold leading-snug text-headline md:text-[2.45rem] md:leading-tight">
@@ -40,12 +41,12 @@ export function Areas() {
           {primaryRequests.map((request, index) => (
             <article
               key={request.title}
-              className={`premium-card rounded-2xl border bg-[linear-gradient(145deg,#ffffff_0%,#f7fbff_100%)] px-5 py-5 transition-all duration-500 ease-out hover:-translate-y-1 hover:border-secondary/38 md:px-6 md:py-6 ${
+              className={`premium-card rounded-2xl border bg-[linear-gradient(145deg,rgba(255,255,255,0.68)_0%,rgba(247,251,255,0.52)_100%)] px-5 py-5 transition-all duration-500 ease-out hover:-translate-y-1 hover:border-secondary/38 md:px-6 md:py-6 ${
                 index === 0
-                  ? "border-secondary/24 bg-[linear-gradient(145deg,#ffffff_0%,#f9fcff_100%)] lg:mt-7"
+                  ? "border-secondary/22 bg-[linear-gradient(145deg,rgba(255,255,255,0.62)_0%,rgba(249,252,255,0.46)_100%)] lg:mt-7"
                   : index === 1
-                    ? "border-secondary/30 bg-[radial-gradient(circle_at_18%_8%,rgba(144,180,206,0.15),transparent_32%),linear-gradient(145deg,#ffffff_0%,#eef6fb_100%)] shadow-[0_24px_72px_rgba(9,64,103,0.07)]"
-                    : "border-border/55 bg-[linear-gradient(145deg,#ffffff_0%,#f6fbff_100%)] lg:mt-4"
+                    ? "border-secondary/28 bg-[radial-gradient(circle_at_18%_8%,rgba(144,180,206,0.14),transparent_32%),linear-gradient(145deg,rgba(255,255,255,0.64)_0%,rgba(238,246,251,0.62)_100%)] shadow-[0_24px_72px_rgba(9,64,103,0.055)]"
+                    : "border-border/45 bg-[linear-gradient(145deg,rgba(255,255,255,0.6)_0%,rgba(246,251,255,0.48)_100%)] lg:mt-4"
               }`}
             >
               <h3 className="text-xl font-semibold leading-tight text-headline md:text-2xl">
