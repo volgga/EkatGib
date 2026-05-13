@@ -1,4 +1,6 @@
-export const YANDEX_METRIKA_ID = 109184395;
+export const YANDEX_METRIKA_ID = Number(
+  process.env.NEXT_PUBLIC_YANDEX_METRIKA_ID || "109184395",
+);
 
 declare global {
   interface Window {
