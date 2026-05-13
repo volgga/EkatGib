@@ -1,7 +1,13 @@
 import Script from "next/script";
-import { YANDEX_METRIKA_ID } from "@/lib/metrika";
 
 export function YandexMetrika() {
+  const metrikaId = process.env.NEXT_PUBLIC_YANDEX_METRIKA_ID;
+  const metrikaCounterId = Number(metrikaId);
+
+  if (!metrikaId || !Number.isFinite(metrikaCounterId)) {
+    return null;
+  }
+
   return (
     <>
       <Script id="yandex-metrika" strategy="afterInteractive">
@@ -15,7 +21,7 @@ export function YandexMetrika() {
             k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
           })(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
 
-          ym(${YANDEX_METRIKA_ID}, "init", {
+          ym(${metrikaCounterId}, "init", {
             ssr: true,
             webvisor: true,
             clickmap: true,
@@ -29,7 +35,7 @@ export function YandexMetrika() {
         <div>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={`https://mc.yandex.ru/watch/${YANDEX_METRIKA_ID}`}
+            src={`https://mc.yandex.ru/watch/${metrikaId}`}
             style={{ position: "absolute", left: "-9999px" }}
             alt=""
           />
