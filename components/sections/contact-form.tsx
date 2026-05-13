@@ -19,6 +19,9 @@ type SubmitStatus =
     }
   | null;
 
+const successButtonClassName =
+  "pointer-events-none min-h-12 w-full rounded-xl border border-border/60 !bg-white px-6 text-center !text-[#3da9fc] !opacity-[0.85] !shadow-none transition-all duration-200 hover:!translate-y-0 hover:border-border/60 hover:!bg-white hover:!shadow-none disabled:pointer-events-none disabled:cursor-not-allowed disabled:!opacity-[0.85]";
+
 export function ContactForm() {
   const [submitStatus, setSubmitStatus] = useState<SubmitStatus>(null);
   const [submittedSuccessfully, setSubmittedSuccessfully] = useState(false);
@@ -125,7 +128,7 @@ export function ContactForm() {
         <Button
           className={
             submittedSuccessfully
-              ? "rounded-xl border border-border/60 bg-white text-headline/80 shadow-none hover:translate-y-0 hover:border-border/60 hover:bg-white hover:shadow-none disabled:cursor-not-allowed disabled:opacity-75"
+              ? successButtonClassName
               : "rounded-xl"
           }
           disabled={isSubmitting || submittedSuccessfully}
