@@ -1,5 +1,5 @@
 export const siteUrl = new URL(
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://example.com",
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://gibadullina-psychology.ru",
 );
 
 export const siteMetadata = {
