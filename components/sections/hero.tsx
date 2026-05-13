@@ -3,12 +3,11 @@ import { GoalLink } from "@/components/analytics/GoalLink";
 
 export function Hero() {
   return (
-    <section id="top" className="section-reveal premium-section-bleed relative overflow-hidden">
+    <section id="top" className="section-reveal relative overflow-hidden">
       <div className="absolute right-[-12rem] top-10 h-[34rem] w-[34rem] rounded-full bg-secondary/24 blur-3xl" />
       <div className="absolute right-[2rem] top-24 h-[26rem] w-[26rem] rounded-full bg-button/9 blur-3xl" />
       <div className="absolute left-[-18rem] top-44 h-[24rem] w-[24rem] rounded-full bg-button/8 blur-3xl" />
-      <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent via-[#f7fbff]/26 to-[#f7fbff]/58" />
-      <div className="relative mx-auto grid max-w-6xl gap-7 px-5 py-9 md:grid-cols-[0.94fr_0.86fr] md:items-center md:gap-12 md:px-8 md:py-20 lg:gap-20">
+      <div className="relative mx-auto grid max-w-6xl gap-7 px-5 py-9 md:grid-cols-[0.94fr_0.86fr] md:items-center md:gap-12 md:px-8 md:pb-18 md:pt-20 lg:gap-20">
         <div className="max-w-[43rem]">
           <p className="text-sm font-semibold uppercase tracking-[0.16em] text-accent">
             Семейный психолог · медиатор · юридический психолог

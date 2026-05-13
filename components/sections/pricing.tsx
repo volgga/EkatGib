@@ -17,7 +17,7 @@ const pricingOptions = [
 
 export function Pricing() {
   return (
-    <section id="pricing" className="section-reveal premium-section-bleed relative scroll-mt-24 overflow-hidden px-5 py-11 md:px-8 md:py-22">
+    <section id="pricing" className="section-reveal relative scroll-mt-24 overflow-hidden px-5 py-10 md:px-8 md:py-16">
       <div className="absolute right-[-16rem] top-24 h-[32rem] w-[32rem] rounded-full bg-secondary/14 blur-3xl" />
       <div className="absolute left-[-18rem] top-[-12rem] h-[34rem] w-[34rem] rounded-full bg-button/5 blur-3xl" />
       <div className="mx-auto max-w-6xl">

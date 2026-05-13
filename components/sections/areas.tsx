@@ -26,7 +26,7 @@ const secondaryRequests = [
 
 export function Areas() {
   return (
-    <section id="areas" className="section-reveal premium-section-bleed relative -mt-3 scroll-mt-24 overflow-hidden px-5 py-11 md:-mt-6 md:px-8 md:py-22">
+    <section id="areas" className="section-reveal relative scroll-mt-24 overflow-hidden px-5 py-11 md:px-8 md:py-18">
       <div className="absolute right-[-14rem] top-28 h-[30rem] w-[30rem] rounded-full bg-secondary/14 blur-3xl" />
       <div className="absolute left-[-18rem] bottom-[-14rem] h-[34rem] w-[34rem] rounded-full bg-button/6 blur-3xl" />
       <div className="mx-auto max-w-6xl">

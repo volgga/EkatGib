@@ -149,10 +149,10 @@ export function Header() {
           </button>
         </div>
       </div>
-      <div className="h-0.5 bg-secondary/12">
+      <div className="fixed inset-x-0 top-[4.25rem] z-[19] h-0.5 bg-white/20">
         <div
           ref={scrollProgressRef}
-          className="h-full origin-left scale-x-0 bg-[linear-gradient(90deg,rgba(61,169,252,0.25),rgba(61,169,252,0.82),rgba(144,180,206,0.55))] will-change-transform"
+          className="h-full origin-left scale-x-0 bg-[#2f9ff0] shadow-[0_0_10px_rgba(61,169,252,0.42)] will-change-transform"
         />
       </div>
       <div

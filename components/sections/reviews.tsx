@@ -147,7 +147,7 @@ export function Reviews() {
   }
 
   return (
-    <section id="reviews" className="section-reveal premium-section-bleed relative scroll-mt-24 overflow-hidden px-5 py-11 md:px-8 md:py-18">
+    <section id="reviews" className="section-reveal relative scroll-mt-24 overflow-hidden px-5 py-11 md:px-8 md:py-16">
       <div className="absolute left-[-14rem] top-32 h-[28rem] w-[28rem] rounded-full bg-secondary/12 blur-3xl" />
       <div className="absolute bottom-[-12rem] right-[-16rem] h-[30rem] w-[30rem] rounded-full bg-button/5 blur-3xl" />
       <div className="mx-auto max-w-6xl">
