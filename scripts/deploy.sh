@@ -1,15 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-cd "$(dirname "$0")/.."
+cat <<'EOF'
+Deploy is handled by GitHub Actions.
 
-git pull
-npm ci
-npm run build
+Push to main to build the Next.js standalone artifact in CI and deploy it to
+the Timeweb Cloud VPS through nginx + PM2.
+EOF
 
-mkdir -p .next/standalone/.next
-cp -R public .next/standalone/
-cp -R .next/static .next/standalone/.next/
-
-pm2 reload ecosystem.config.cjs --env production
-pm2 save
+exit 1

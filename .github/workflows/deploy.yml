@@ -36,6 +36,7 @@ jobs:
 
       - name: Prepare deploy package
         run: |
+          set -euo pipefail
           for name in TELEGRAM_BOT_TOKEN TELEGRAM_CHAT_ID NEXT_PUBLIC_SITE_URL NEXT_PUBLIC_YANDEX_METRIKA_ID; do
             if [ -z "${!name}" ]; then
               echo "::error::$name is not configured"
@@ -59,6 +60,9 @@ jobs:
           } > deploy-package/.env.production
           chmod 600 deploy-package/.env.production
           tar -czf deploy-package.tar.gz -C deploy-package .
+          tar -tzf deploy-package.tar.gz > /dev/null
+          cp deploy-package.tar.gz "ekat-gib-${GITHUB_SHA}.tar.gz"
+          sha256sum "ekat-gib-${GITHUB_SHA}.tar.gz" > "ekat-gib-${GITHUB_SHA}.tar.gz.sha256"
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -80,8 +84,9 @@ jobs:
             -o ServerAliveInterval=30 \
             -o ServerAliveCountMax=10 \
             -o ConnectTimeout=60 \
-            deploy-package.tar.gz \
-            "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/tmp/ekat-gib.tar.gz"
+            "ekat-gib-${GITHUB_SHA}.tar.gz" \
+            "ekat-gib-${GITHUB_SHA}.tar.gz.sha256" \
+            "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/tmp/"
 
       - name: Activate on VPS
         run: |
@@ -90,12 +95,53 @@ jobs:
             -o ServerAliveInterval=30 \
             -o ServerAliveCountMax=10 \
             -o ConnectTimeout=60 \
-            "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}" <<'EOF'
-            set -e
-            mkdir -p /var/www/ekat-gib
-            tar -xzf /tmp/ekat-gib.tar.gz -C /var/www/ekat-gib
-            cd /var/www/ekat-gib
-            pm2 startOrReload ecosystem.config.cjs --env production --update-env
-            pm2 reload ekat-gib --update-env
+            "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}" \
+            "GITHUB_SHA=${GITHUB_SHA} bash -s" <<'EOF'
+            set -euo pipefail
+
+            APP_NAME="ekat-gib"
+            RELEASES_DIR="/var/www/releases"
+            RELEASE_DIR="${RELEASES_DIR}/${APP_NAME}-${GITHUB_SHA}"
+            CURRENT_LINK="/var/www/${APP_NAME}"
+            ARCHIVE="/tmp/${APP_NAME}-${GITHUB_SHA}.tar.gz"
+            CHECKSUM_FILE="/tmp/${APP_NAME}-${GITHUB_SHA}.tar.gz.sha256"
+            TMP_LINK="${CURRENT_LINK}.tmp-${GITHUB_SHA}"
+            STAGING_DIR="${RELEASE_DIR}.staging-$$"
+            trap 'rm -rf "${STAGING_DIR}" "${TMP_LINK}"' EXIT
+
+            cd /tmp
+            sha256sum -c "${CHECKSUM_FILE}"
+
+            mkdir -p "${RELEASES_DIR}"
+            rm -rf "${STAGING_DIR}"
+            mkdir -p "${STAGING_DIR}"
+
+            tar -xzf "${ARCHIVE}" -C "${STAGING_DIR}"
+
+            CURRENT_TARGET="$(readlink "${CURRENT_LINK}" 2>/dev/null || true)"
+
+            if [ "${CURRENT_TARGET}" = "${RELEASE_DIR}" ] && [ -d "${RELEASE_DIR}" ]; then
+              cp "${STAGING_DIR}/.env.production" "${RELEASE_DIR}/.env.production"
+              rm -rf "${STAGING_DIR}"
+            else
+              rm -rf "${RELEASE_DIR}"
+              mv "${STAGING_DIR}" "${RELEASE_DIR}"
+            fi
+
+            if [ -e "${CURRENT_LINK}" ] && [ ! -L "${CURRENT_LINK}" ]; then
+              mv "${CURRENT_LINK}" "${CURRENT_LINK}.legacy-$(date +%Y%m%d%H%M%S)"
+            fi
+
+            ln -sfn "${RELEASE_DIR}" "${TMP_LINK}"
+            mv -Tf "${TMP_LINK}" "${CURRENT_LINK}"
+
+            cd "${CURRENT_LINK}"
+            pm2 reload ekat-gib --update-env || pm2 start ecosystem.config.cjs --env production
             pm2 save
+            rm -f "${ARCHIVE}" "${CHECKSUM_FILE}"
+
+            find "${RELEASES_DIR}" -maxdepth 1 -type d -name "${APP_NAME}-*" -print \
+              | sort -r \
+              | tail -n +4 \
+              | xargs -r rm -rf
           EOF

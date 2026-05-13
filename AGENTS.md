@@ -21,8 +21,8 @@
 - Next.js App Router;
 - TypeScript;
 - Tailwind CSS;
-- Vercel;
 - GitHub;
+- VPS (Timeweb Cloud), nginx, PM2, GitHub Actions;
 - production domain: https://gibadullina-psychology.ru
 
 Цель сайта:
@@ -61,7 +61,7 @@
 - быстрый Lighthouse;
 - form phone required;
 - international phone numbers supported;
-- no .env/.next/node_modules/.vercel in git.
+- no .env/.next/node_modules in git.
 
 После изменений всегда:
 - список файлов;

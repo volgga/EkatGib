@@ -14,18 +14,16 @@ sudo npm install -g pm2
 
 ## First Deploy
 
+Build happens in GitHub Actions. The VPS should only receive and run the
+prepared standalone artifact.
+
 ```bash
-git clone <repo-url> /var/www/ekat-gib
-cd /var/www/ekat-gib
-npm ci
-NEXT_PUBLIC_SITE_URL=https://gibadullina-psychology.ru npm run build
-mkdir -p .next/standalone/.next
-cp -R public .next/standalone/
-cp -R .next/static .next/standalone/.next/
-pm2 start ecosystem.config.cjs --env production
-pm2 save
+sudo mkdir -p /var/www/releases
+sudo chown -R $USER:$USER /var/www/releases
 pm2 startup
 ```
+
+Then push to `main` and let GitHub Actions create `/var/www/ekat-gib`.
 
 ## Nginx
 
@@ -66,7 +64,8 @@ sudo certbot --nginx -d gibadullina-psychology.ru -d www.gibadullina-psychology.
 
 ## Updates
 
-```bash
-cd /var/www/ekat-gib
-NEXT_PUBLIC_SITE_URL=https://gibadullina-psychology.ru ./scripts/deploy.sh
-```
+Push to `main`. GitHub Actions builds the Next.js standalone artifact, uploads
+`ekat-gib-${GITHUB_SHA}.tar.gz` to `/tmp`, verifies its checksum, extracts it to
+`/var/www/releases/ekat-gib-${GITHUB_SHA}`, atomically updates
+`/var/www/ekat-gib`, reloads PM2 with updated env, and keeps the latest 3
+releases.
