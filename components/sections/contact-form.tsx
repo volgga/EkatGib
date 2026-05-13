@@ -21,6 +21,7 @@ type SubmitStatus =
 
 export function ContactForm() {
   const [submitStatus, setSubmitStatus] = useState<SubmitStatus>(null);
+  const [submittedSuccessfully, setSubmittedSuccessfully] = useState(false);
   const {
     register,
     handleSubmit,
@@ -34,6 +35,10 @@ export function ContactForm() {
   });
 
   async function onSubmit(values: ContactFormValues) {
+    if (submittedSuccessfully) {
+      return;
+    }
+
     setSubmitStatus(null);
 
     let response: Response;
@@ -47,7 +52,7 @@ export function ContactForm() {
         body: JSON.stringify({
           name: values.name,
           phone: values.phone,
-          message: values.message,
+          message: values.message || "",
           source: `contact_form:${values.contactMethod}`,
           company: values.company || "",
         }),
@@ -69,6 +74,7 @@ export function ContactForm() {
     }
 
     reachGoal("form_submit", { contactMethod: values.contactMethod });
+    setSubmittedSuccessfully(true);
     setSubmitStatus({
       type: "success",
       message: "Заявка отправлена. Екатерина свяжется с вами в ближайшее время.",
@@ -116,8 +122,20 @@ export function ContactForm() {
         />
       </Field>
       <div className="grid gap-2">
-        <Button className="rounded-xl" disabled={isSubmitting} type="submit">
-          {isSubmitting ? "Отправляем..." : "Отправить заявку"}
+        <Button
+          className={
+            submittedSuccessfully
+              ? "rounded-xl border border-border/60 bg-white text-headline/80 shadow-none hover:translate-y-0 hover:border-border/60 hover:bg-white hover:shadow-none disabled:cursor-not-allowed disabled:opacity-75"
+              : "rounded-xl"
+          }
+          disabled={isSubmitting || submittedSuccessfully}
+          type="submit"
+        >
+          {submittedSuccessfully
+            ? "Отправлено ✓"
+            : isSubmitting
+              ? "Отправляем..."
+              : "Отправить заявку"}
         </Button>
         <p className="text-center text-xs font-medium text-text/70">
           Первый ответ — без обязательств
@@ -127,7 +145,7 @@ export function ContactForm() {
         <p
           className={`rounded-lg px-4 py-3 text-sm ${
             submitStatus.type === "success"
-              ? "bg-surface text-headline"
+              ? "border border-border/45 bg-white/80 text-headline shadow-[0_10px_28px_rgba(9,64,103,0.04)]"
               : "bg-danger/10 text-danger"
           }`}
           role={submitStatus.type === "success" ? "status" : "alert"}

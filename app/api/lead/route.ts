@@ -30,6 +30,27 @@ function sanitizeMessage(value: string) {
     .trim();
 }
 
+function escapeHtml(value: string) {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function formatSource(source: string) {
+  const normalizedSource = source.replace(/^contact_form:/, "").toLowerCase();
+
+  const labels: Record<string, string> = {
+    whatsapp: "WhatsApp",
+    telegram: "Telegram",
+    max: "MAX",
+    phone: "Телефон",
+  };
+
+  return labels[normalizedSource] || source;
+}
+
 const leadSchema = z.object({
   name: z.string().transform(sanitizeText).pipe(z.string().min(2).max(80)),
   phone: z
@@ -41,7 +62,7 @@ const leadSchema = z.object({
 
       return digitsCount >= 10 && digitsCount <= 15;
     }),
-  message: z.string().transform(sanitizeMessage).pipe(z.string().min(10).max(1200)),
+  message: z.string().transform(sanitizeMessage).pipe(z.string().max(1200)).optional(),
   source: z.string().transform(sanitizeText).pipe(z.string().min(2).max(120)),
   company: z.string().optional(),
 });
@@ -78,18 +99,35 @@ function cleanupRateLimits() {
 }
 
 function formatTelegramMessage(lead: z.infer<typeof leadSchema>) {
+  const formattedDate = new Intl.DateTimeFormat("ru-RU", {
+    dateStyle: "medium",
+    timeStyle: "short",
+    timeZone: "Europe/Moscow",
+  }).format(new Date());
+
+  const messageBlock = lead.message
+    ? [
+        "💬 <b>Сообщение:</b>",
+        escapeHtml(lead.message),
+        "",
+      ]
+    : [];
+
   return [
-    "🧠 Новая заявка",
+    "🔥 <b>Новая заявка</b>",
     "",
-    `👤 Имя: ${lead.name}`,
-    `📞 Телефон: ${lead.phone}`,
-    `💬 Сообщение: ${lead.message}`,
-    `🌐 Source: ${lead.source}`,
-    `🕒 Время: ${new Intl.DateTimeFormat("ru-RU", {
-      dateStyle: "medium",
-      timeStyle: "short",
-      timeZone: "Europe/Moscow",
-    }).format(new Date())}`,
+    "👤 <b>Имя:</b>",
+    escapeHtml(lead.name),
+    "",
+    "📞 <b>Телефон:</b>",
+    escapeHtml(lead.phone),
+    "",
+    ...messageBlock,
+    "🌐 <b>Связаться:</b>",
+    escapeHtml(formatSource(lead.source)),
+    "",
+    "🕒 <b>Время:</b>",
+    escapeHtml(formattedDate),
   ].join("\n");
 }
 
@@ -137,6 +175,7 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify({
         chat_id: chatId,
         text: formatTelegramMessage(parsed.data),
+        parse_mode: "HTML",
         disable_web_page_preview: true,
       }),
     });

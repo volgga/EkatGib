@@ -15,7 +15,7 @@ export const contactSchema = z.object({
       message: "Укажите номер в международном формате",
     }),
   contactMethod: z.enum(["phone", "whatsapp", "telegram", "max"]),
-  message: z.string().min(10, "Коротко опишите ситуацию"),
+  message: z.string().max(1200, "Сократите сообщение").optional(),
   company: z.string().max(0).optional(),
 });
 
