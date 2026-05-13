@@ -36,6 +36,12 @@ jobs:
 
       - name: Prepare deploy package
         run: |
+          for name in TELEGRAM_BOT_TOKEN TELEGRAM_CHAT_ID NEXT_PUBLIC_SITE_URL NEXT_PUBLIC_YANDEX_METRIKA_ID; do
+            if [ -z "${!name}" ]; then
+              echo "::error::$name is not configured"
+              exit 1
+            fi
+          done
           mkdir -p deploy-package/.next
           cp -R .next/standalone deploy-package/.next/standalone
           cp -R .next/static deploy-package/.next/static
@@ -45,7 +51,19 @@ jobs:
           cp -R public deploy-package/.next/standalone/public
           cp package.json deploy-package/package.json
           cp ecosystem.config.cjs deploy-package/ecosystem.config.cjs
+          {
+            printf 'TELEGRAM_BOT_TOKEN=%s\n' "$TELEGRAM_BOT_TOKEN"
+            printf 'TELEGRAM_CHAT_ID=%s\n' "$TELEGRAM_CHAT_ID"
+            printf 'NEXT_PUBLIC_SITE_URL=%s\n' "$NEXT_PUBLIC_SITE_URL"
+            printf 'NEXT_PUBLIC_YANDEX_METRIKA_ID=%s\n' "$NEXT_PUBLIC_YANDEX_METRIKA_ID"
+          } > deploy-package/.env.production
+          chmod 600 deploy-package/.env.production
           tar -czf deploy-package.tar.gz -C deploy-package .
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          NEXT_PUBLIC_SITE_URL: https://gibadullina-psychology.ru
+          NEXT_PUBLIC_YANDEX_METRIKA_ID: ${{ secrets.NEXT_PUBLIC_YANDEX_METRIKA_ID }}
 
       - name: Configure SSH
         run: |
@@ -77,6 +95,7 @@ jobs:
             mkdir -p /var/www/ekat-gib
             tar -xzf /tmp/ekat-gib.tar.gz -C /var/www/ekat-gib
             cd /var/www/ekat-gib
-            pm2 reload ekat-gib || pm2 start ecosystem.config.cjs --env production
+            pm2 startOrReload ecosystem.config.cjs --env production --update-env
+            pm2 reload ekat-gib --update-env
             pm2 save
           EOF
