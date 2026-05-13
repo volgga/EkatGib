@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type TouchEvent } from "react";
 
 const testimonials = [
   {
@@ -51,8 +51,8 @@ const trustStats = ["1000+ клиентов", "5.0 оценка", "15 лет п�
 export function Reviews() {
   const [activeSlide, setActiveSlide] = useState(0);
   const [activeSlideHeight, setActiveSlideHeight] = useState<number | null>(null);
-  const mobileSliderRef = useRef<HTMLDivElement>(null);
   const mobileSlideRefs = useRef<Array<HTMLDivElement | null>>([]);
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
   const featuredReview = testimonials.find((review) => review.featured);
   const regularReviews = testimonials.filter((review) => !review.featured);
   const mobileSlides = [
@@ -77,6 +77,7 @@ export function Reviews() {
       regularReviews[4],
     ],
   ];
+  const lastMobileSlideIndex = mobileSlides.length - 1;
 
   useEffect(() => {
     const activeElement = mobileSlideRefs.current[activeSlide];
@@ -101,27 +102,38 @@ export function Reviews() {
     };
   }, [activeSlide]);
 
-  function handleMobileSliderScroll() {
-    const slider = mobileSliderRef.current;
-
-    if (!slider) {
-      return;
-    }
-
-    setActiveSlide(Math.round(slider.scrollLeft / slider.clientWidth));
+  function goToMobileSlide(index: number) {
+    setActiveSlide(Math.min(Math.max(index, 0), lastMobileSlideIndex));
   }
 
-  function scrollToMobileSlide(index: number) {
-    const slider = mobileSliderRef.current;
+  function handleTouchStart(event: TouchEvent<HTMLDivElement>) {
+    const touch = event.touches[0];
 
-    if (!slider) {
+    if (!touch) {
       return;
     }
 
-    slider.scrollTo({
-      left: slider.clientWidth * index,
-      behavior: "smooth",
-    });
+    touchStartRef.current = { x: touch.clientX, y: touch.clientY };
+  }
+
+  function handleTouchEnd(event: TouchEvent<HTMLDivElement>) {
+    const start = touchStartRef.current;
+    const touch = event.changedTouches[0];
+
+    touchStartRef.current = null;
+
+    if (!start || !touch) {
+      return;
+    }
+
+    const deltaX = touch.clientX - start.x;
+    const deltaY = touch.clientY - start.y;
+
+    if (Math.abs(deltaX) < 46 || Math.abs(deltaX) < Math.abs(deltaY) * 1.15) {
+      return;
+    }
+
+    goToMobileSlide(activeSlide + (deltaX < 0 ? 1 : -1));
   }
 
   return (
@@ -140,36 +152,52 @@ export function Reviews() {
 
         <div className="relative mt-5 lg:hidden">
           <div
-            ref={mobileSliderRef}
             aria-label="Отзывы"
-            className="-mx-5 flex snap-x snap-mandatory items-start gap-3 overflow-x-auto px-5 pb-1 transition-[height] duration-500 ease-out [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            className="-mx-5 overflow-hidden px-5 transition-[height] duration-300 ease-out [touch-action:pan-y] motion-reduce:transition-none"
             role="region"
-            style={{ height: activeSlideHeight ? `${activeSlideHeight + 6}px` : undefined }}
-            onScroll={handleMobileSliderScroll}
+            style={{ height: activeSlideHeight ? `${activeSlideHeight}px` : undefined }}
+            onTouchEnd={handleTouchEnd}
+            onTouchStart={handleTouchStart}
           >
-            {mobileSlides.map((slide, index) => (
-              <div
-                key={slide.review.name}
-                ref={(element) => {
-                  mobileSlideRefs.current[index] = element;
-                }}
-                className={`min-w-full snap-center transition-all duration-500 ease-out ${
-                  activeSlide === index ? "scale-100 opacity-100" : "scale-[0.985] opacity-78"
-                }`}
-              >
-                {slide.kind === "featured" ? (
-                  <FeaturedReview name={slide.review.name} text={slide.review.text} />
-                ) : (
-                  <ReviewCard
-                    name={slide.review.name}
-                    text={slide.review.text}
-                    compact={index > 3}
-                  />
-                )}
-              </div>
-            ))}
+            <div
+              className="flex items-start transition-transform duration-300 ease-out motion-reduce:transition-none"
+              style={{ transform: `translateX(-${activeSlide * 100}%)` }}
+            >
+              {mobileSlides.map((slide, index) => (
+                <div
+                  key={slide.review.name}
+                  ref={(element) => {
+                    mobileSlideRefs.current[index] = element;
+                  }}
+                  aria-hidden={activeSlide !== index}
+                  className={`min-w-full transition-all duration-300 ease-out motion-reduce:transition-none ${
+                    activeSlide === index ? "scale-100 opacity-100" : "scale-[0.985] opacity-70"
+                  }`}
+                >
+                  {slide.kind === "featured" ? (
+                    <FeaturedReview name={slide.review.name} text={slide.review.text} />
+                  ) : (
+                    <ReviewCard
+                      name={slide.review.name}
+                      text={slide.review.text}
+                      compact={index > 3}
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="mt-2 flex justify-center gap-2">
+          <div className="mt-3 flex items-center justify-center gap-3">
+            <button
+              aria-label="Предыдущий отзыв"
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-secondary/28 bg-white/72 text-xl leading-none text-headline shadow-[0_8px_22px_rgba(9,64,103,0.035)] transition-all duration-200 hover:border-secondary/55 hover:bg-surface disabled:cursor-not-allowed disabled:opacity-35"
+              disabled={activeSlide === 0}
+              type="button"
+              onClick={() => goToMobileSlide(activeSlide - 1)}
+            >
+              ‹
+            </button>
+            <div className="flex justify-center gap-2">
             {mobileSlides.map((slide, index) => (
               <button
                 key={`${slide.review.name}-dot`}
@@ -180,9 +208,19 @@ export function Reviews() {
                     : "w-2 bg-secondary/30 hover:bg-secondary/55"
                 }`}
                 type="button"
-                onClick={() => scrollToMobileSlide(index)}
+                onClick={() => goToMobileSlide(index)}
               />
             ))}
+            </div>
+            <button
+              aria-label="Следующий отзыв"
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-secondary/28 bg-white/72 text-xl leading-none text-headline shadow-[0_8px_22px_rgba(9,64,103,0.035)] transition-all duration-200 hover:border-secondary/55 hover:bg-surface disabled:cursor-not-allowed disabled:opacity-35"
+              disabled={activeSlide === lastMobileSlideIndex}
+              type="button"
+              onClick={() => goToMobileSlide(activeSlide + 1)}
+            >
+              ›
+            </button>
           </div>
           <div className="mt-3">
             <TrustBar />

@@ -30,20 +30,39 @@ export function Header() {
   }, [isMenuOpen]);
 
   useEffect(() => {
+    let frameId: number | null = null;
+
     function updateScrollState() {
       const scrollTop = window.scrollY;
       const scrollableHeight = document.documentElement.scrollHeight - window.innerHeight;
 
-      setScrollProgress(scrollableHeight > 0 ? (scrollTop / scrollableHeight) * 100 : 0);
+      setScrollProgress(
+        scrollableHeight > 0 ? Math.min(Math.max(scrollTop / scrollableHeight, 0), 1) : 0,
+      );
+    }
+
+    function scheduleScrollUpdate() {
+      if (frameId !== null) {
+        return;
+      }
+
+      frameId = window.requestAnimationFrame(() => {
+        frameId = null;
+        updateScrollState();
+      });
     }
 
     updateScrollState();
-    window.addEventListener("scroll", updateScrollState, { passive: true });
-    window.addEventListener("resize", updateScrollState);
+    window.addEventListener("scroll", scheduleScrollUpdate, { passive: true });
+    window.addEventListener("resize", scheduleScrollUpdate);
 
     return () => {
-      window.removeEventListener("scroll", updateScrollState);
-      window.removeEventListener("resize", updateScrollState);
+      if (frameId !== null) {
+        window.cancelAnimationFrame(frameId);
+      }
+
+      window.removeEventListener("scroll", scheduleScrollUpdate);
+      window.removeEventListener("resize", scheduleScrollUpdate);
     };
   }, []);
 
@@ -126,8 +145,8 @@ export function Header() {
       </div>
       <div className="h-0.5 bg-secondary/12">
         <div
-          className="h-full bg-[linear-gradient(90deg,rgba(61,169,252,0.25),rgba(61,169,252,0.82),rgba(144,180,206,0.55))] transition-[width] duration-200 ease-out"
-          style={{ width: `${scrollProgress}%` }}
+          className="h-full origin-left bg-[linear-gradient(90deg,rgba(61,169,252,0.25),rgba(61,169,252,0.82),rgba(144,180,206,0.55))] transition-transform duration-75 ease-linear"
+          style={{ transform: `scaleX(${scrollProgress})` }}
         />
       </div>
       <div
