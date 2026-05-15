@@ -146,7 +146,7 @@ function getTelegramChatIds() {
     return chatIds;
   }
 
-  return process.env.TELEGRAM_CHAT_ID ? [process.env.TELEGRAM_CHAT_ID] : [];
+  return process.env.TELEGRAM_CHAT_ID?.trim() ? [process.env.TELEGRAM_CHAT_ID.trim()] : [];
 }
 
 async function sendTelegramMessage(token: string, chatId: string, text: string) {
@@ -218,14 +218,16 @@ export async function POST(request: NextRequest) {
   const failedResults = results.filter((result) => result.status === "rejected");
 
   if (failedResults.length > 0) {
-    console.warn("Lead submission: Telegram delivery failed for some chats", {
-      failed: failedResults.length,
-      total: results.length,
+    console.warn("Lead submission: Telegram delivery failed for some recipients", {
+      failedRecipients: failedResults.length,
+      totalRecipients: results.length,
     });
   }
 
   if (failedResults.length === results.length) {
-    console.error("Lead submission failed: Telegram delivery failed for all chats");
+    console.error("Lead submission failed: Telegram delivery failed for all recipients", {
+      totalRecipients: results.length,
+    });
     return NextResponse.json({ error: "Lead delivery failed" }, { status: 502 });
   }
 

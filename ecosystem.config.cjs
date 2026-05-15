@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 const fs = require("node:fs");
-const path = require("node:path");
 
 function readEnvFile(filePath) {
   if (!fs.existsSync(filePath)) {
@@ -34,7 +33,7 @@ function readEnvFile(filePath) {
     }, {});
 }
 
-const productionEnv = readEnvFile(path.join(__dirname, ".env.production"));
+const productionEnv = readEnvFile("/var/www/shared/ekat-gib.env");
 
 module.exports = {
   apps: [
