@@ -34,6 +34,8 @@ function readEnvFile(filePath) {
 }
 
 const productionEnv = readEnvFile("/var/www/shared/ekat-gib.env");
+const runtimePort = 3001;
+const runtimeHostname = "127.0.0.1";
 
 module.exports = {
   apps: [
@@ -43,7 +45,8 @@ module.exports = {
       env: {
         ...productionEnv,
         NODE_ENV: "production",
-        PORT: productionEnv.PORT || 3000,
+        PORT: runtimePort,
+        HOSTNAME: runtimeHostname,
       },
     },
   ],

@@ -105,11 +105,12 @@ jobs:
             set -euo pipefail
 
             APP_NAME="ekat-gib"
+            APP_DIR="/var/www/clients"
             SHARED_DIR="/var/www/shared"
             SHARED_ENV="${SHARED_DIR}/${APP_NAME}.env"
-            RELEASES_DIR="/var/www/releases"
+            RELEASES_DIR="${APP_DIR}/ekatgib-releases"
             RELEASE_DIR="${RELEASES_DIR}/${APP_NAME}-${GITHUB_SHA}"
-            CURRENT_LINK="/var/www/${APP_NAME}"
+            CURRENT_LINK="${APP_DIR}/ekatgib"
             ARCHIVE="/tmp/${APP_NAME}-${GITHUB_SHA}.tar.gz"
             CHECKSUM_FILE="/tmp/${APP_NAME}-${GITHUB_SHA}.tar.gz.sha256"
             RUNTIME_ENV="/tmp/${APP_NAME}-${GITHUB_SHA}.env"
@@ -120,7 +121,7 @@ jobs:
             cd /tmp
             sha256sum -c "${CHECKSUM_FILE}"
 
-            mkdir -p "${RELEASES_DIR}"
+            mkdir -p "${APP_DIR}" "${RELEASES_DIR}"
             rm -rf "${STAGING_DIR}"
             mkdir -p "${STAGING_DIR}"
 
