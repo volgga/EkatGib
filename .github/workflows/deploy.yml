@@ -82,11 +82,14 @@ jobs:
           ssh-keyscan -H "${{ secrets.VPS_HOST }}" >> ~/.ssh/known_hosts
 
       - name: Upload deploy package
+        timeout-minutes: 5
         run: |
+          ls -lh "ekat-gib-${GITHUB_SHA}.tar.gz" "ekat-gib-${GITHUB_SHA}.tar.gz.sha256" "ekat-gib-${GITHUB_SHA}.env"
           scp \
+            -v \
             -i ~/.ssh/deploy_key \
             -o ServerAliveInterval=30 \
-            -o ServerAliveCountMax=10 \
+            -o ServerAliveCountMax=3 \
             -o ConnectTimeout=60 \
             "ekat-gib-${GITHUB_SHA}.tar.gz" \
             "ekat-gib-${GITHUB_SHA}.tar.gz.sha256" \
