@@ -156,3 +156,6 @@ jobs:
               | tail -n +4 \
               | xargs -r rm -rf
           EOF
+
+      - name: Ping IndexNow
+        run: curl -fsS -X POST https://servakbaza.ru/api/indexnow || true
