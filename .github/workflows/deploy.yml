@@ -5,6 +5,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
 jobs:
   deploy:
     name: Build and deploy
@@ -34,7 +37,7 @@ jobs:
           NEXT_PUBLIC_SITE_URL: https://gibadullina-psychology.ru
           NEXT_PUBLIC_YANDEX_METRIKA_ID: ${{ secrets.NEXT_PUBLIC_YANDEX_METRIKA_ID }}
 
-      - name: Prepare deploy package
+      - name: Validate deploy secrets
         run: |
           set -euo pipefail
           for name in TELEGRAM_BOT_TOKEN NEXT_PUBLIC_SITE_URL NEXT_PUBLIC_YANDEX_METRIKA_ID; do
@@ -47,26 +50,6 @@ jobs:
             echo "::error::TELEGRAM_CHAT_IDS is not configured"
             exit 1
           fi
-          mkdir -p deploy-package/.next
-          cp -R .next/standalone deploy-package/.next/standalone
-          cp -R .next/static deploy-package/.next/static
-          cp -R public deploy-package/public
-          mkdir -p deploy-package/.next/standalone/.next
-          cp -R .next/static deploy-package/.next/standalone/.next/static
-          cp -R public deploy-package/.next/standalone/public
-          cp package.json deploy-package/package.json
-          cp ecosystem.config.cjs deploy-package/ecosystem.config.cjs
-          tar -czf deploy-package.tar.gz -C deploy-package .
-          tar -tzf deploy-package.tar.gz > /dev/null
-          cp deploy-package.tar.gz "ekat-gib-${GITHUB_SHA}.tar.gz"
-          sha256sum "ekat-gib-${GITHUB_SHA}.tar.gz" > "ekat-gib-${GITHUB_SHA}.tar.gz.sha256"
-          {
-            printf 'TELEGRAM_BOT_TOKEN=%s\n' "$TELEGRAM_BOT_TOKEN"
-            printf 'TELEGRAM_CHAT_IDS=%s\n' "$TELEGRAM_CHAT_IDS"
-            printf 'NEXT_PUBLIC_SITE_URL=%s\n' "$NEXT_PUBLIC_SITE_URL"
-            printf 'NEXT_PUBLIC_YANDEX_METRIKA_ID=%s\n' "$NEXT_PUBLIC_YANDEX_METRIKA_ID"
-          } > "ekat-gib-${GITHUB_SHA}.env"
-          chmod 600 "ekat-gib-${GITHUB_SHA}.env"
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_IDS: ${{ secrets.TELEGRAM_CHAT_IDS }}
@@ -81,38 +64,29 @@ jobs:
           chmod 600 ~/.ssh/deploy_key
           ssh-keyscan -H "${{ secrets.VPS_HOST }}" >> ~/.ssh/known_hosts
 
-      - name: Upload deploy package
-        timeout-minutes: 10
+      - name: Deploy on VPS
+        timeout-minutes: 20
         run: |
           set -euo pipefail
-          ls -lh "ekat-gib-${GITHUB_SHA}.tar.gz" "ekat-gib-${GITHUB_SHA}.tar.gz.sha256" "ekat-gib-${GITHUB_SHA}.env"
-          SSH_OPTS=(
-            -i ~/.ssh/deploy_key
-            -o BatchMode=yes
-            -o ServerAliveInterval=30
-            -o ServerAliveCountMax=3
-            -o ConnectTimeout=60
-            -o Compression=yes
-          )
-          upload_file() {
-            local source_file="$1"
-            local remote_file="/tmp/$(basename "$source_file")"
-            echo "Uploading ${source_file} to ${remote_file}"
-            ssh "${SSH_OPTS[@]}" "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}" "cat > '${remote_file}'" < "${source_file}"
-          }
-          upload_file "ekat-gib-${GITHUB_SHA}.tar.gz"
-          upload_file "ekat-gib-${GITHUB_SHA}.tar.gz.sha256"
-          upload_file "ekat-gib-${GITHUB_SHA}.env"
+          runtime_env_b64="$(
+            {
+              printf 'TELEGRAM_BOT_TOKEN=%s\n' "$TELEGRAM_BOT_TOKEN"
+              printf 'TELEGRAM_CHAT_IDS=%s\n' "$TELEGRAM_CHAT_IDS"
+              printf 'NEXT_PUBLIC_SITE_URL=%s\n' "$NEXT_PUBLIC_SITE_URL"
+              printf 'NEXT_PUBLIC_YANDEX_METRIKA_ID=%s\n' "$NEXT_PUBLIC_YANDEX_METRIKA_ID"
+            } | base64 | tr -d '\n'
+          )"
+          site_url_b64="$(printf '%s' "$NEXT_PUBLIC_SITE_URL" | base64 | tr -d '\n')"
+          metrika_id_b64="$(printf '%s' "$NEXT_PUBLIC_YANDEX_METRIKA_ID" | base64 | tr -d '\n')"
 
-      - name: Activate on VPS
-        run: |
           ssh \
             -i ~/.ssh/deploy_key \
+            -o BatchMode=yes \
             -o ServerAliveInterval=30 \
-            -o ServerAliveCountMax=10 \
+            -o ServerAliveCountMax=3 \
             -o ConnectTimeout=60 \
             "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}" \
-            "GITHUB_SHA=${GITHUB_SHA} bash -s" <<'EOF'
+            "GITHUB_SHA='${GITHUB_SHA}' GITHUB_REF_NAME='${GITHUB_REF_NAME}' GITHUB_REPOSITORY='${GITHUB_REPOSITORY}' DEPLOY_REPO_TOKEN='${DEPLOY_REPO_TOKEN}' RUNTIME_ENV_B64='${runtime_env_b64}' NEXT_PUBLIC_SITE_URL_B64='${site_url_b64}' NEXT_PUBLIC_YANDEX_METRIKA_ID_B64='${metrika_id_b64}' bash -s" <<'EOF'
             set -euo pipefail
 
             APP_NAME="ekat-gib"
@@ -122,21 +96,46 @@ jobs:
             RELEASES_DIR="${APP_DIR}/ekatgib-releases"
             RELEASE_DIR="${RELEASES_DIR}/${APP_NAME}-${GITHUB_SHA}"
             CURRENT_LINK="${APP_DIR}/ekatgib"
-            ARCHIVE="/tmp/${APP_NAME}-${GITHUB_SHA}.tar.gz"
-            CHECKSUM_FILE="/tmp/${APP_NAME}-${GITHUB_SHA}.tar.gz.sha256"
-            RUNTIME_ENV="/tmp/${APP_NAME}-${GITHUB_SHA}.env"
+            SOURCE_DIR="${APP_DIR}/ekatgib-source"
             TMP_LINK="${CURRENT_LINK}.tmp-${GITHUB_SHA}"
             STAGING_DIR="${RELEASE_DIR}.staging-$$"
             trap 'rm -rf "${STAGING_DIR}" "${TMP_LINK}"' EXIT
 
-            cd /tmp
-            sha256sum -c "${CHECKSUM_FILE}"
+            command -v git >/dev/null
+            command -v npm >/dev/null
+            command -v pm2 >/dev/null
 
-            mkdir -p "${APP_DIR}" "${RELEASES_DIR}"
+            mkdir -p "${APP_DIR}" "${RELEASES_DIR}" "${SHARED_DIR}"
+            printf '%s' "${RUNTIME_ENV_B64}" | base64 -d > "${SHARED_ENV}"
+            chmod 600 "${SHARED_ENV}"
+
+            if [ ! -d "${SOURCE_DIR}/.git" ]; then
+              rm -rf "${SOURCE_DIR}"
+              git init "${SOURCE_DIR}"
+              git -C "${SOURCE_DIR}" remote add origin "https://github.com/${GITHUB_REPOSITORY}.git"
+            fi
+
+            git -C "${SOURCE_DIR}" remote set-url origin "https://github.com/${GITHUB_REPOSITORY}.git"
+            git -C "${SOURCE_DIR}" -c http.extraheader="AUTHORIZATION: bearer ${DEPLOY_REPO_TOKEN}" fetch --force --depth=1 origin "${GITHUB_REF_NAME}"
+            git -C "${SOURCE_DIR}" checkout --force "${GITHUB_SHA}"
+            git -C "${SOURCE_DIR}" clean -fdx
+
+            cd "${SOURCE_DIR}"
+            npm ci
+            NEXT_PUBLIC_SITE_URL="$(printf '%s' "${NEXT_PUBLIC_SITE_URL_B64}" | base64 -d)" \
+              NEXT_PUBLIC_YANDEX_METRIKA_ID="$(printf '%s' "${NEXT_PUBLIC_YANDEX_METRIKA_ID_B64}" | base64 -d)" \
+              npm run build
+
             rm -rf "${STAGING_DIR}"
-            mkdir -p "${STAGING_DIR}"
-
-            tar -xzf "${ARCHIVE}" -C "${STAGING_DIR}"
+            mkdir -p "${STAGING_DIR}/.next"
+            cp -R .next/standalone "${STAGING_DIR}/.next/standalone"
+            cp -R .next/static "${STAGING_DIR}/.next/static"
+            cp -R public "${STAGING_DIR}/public"
+            mkdir -p "${STAGING_DIR}/.next/standalone/.next"
+            cp -R .next/static "${STAGING_DIR}/.next/standalone/.next/static"
+            cp -R public "${STAGING_DIR}/.next/standalone/public"
+            cp package.json "${STAGING_DIR}/package.json"
+            cp ecosystem.config.cjs "${STAGING_DIR}/ecosystem.config.cjs"
 
             CURRENT_TARGET="$(readlink "${CURRENT_LINK}" 2>/dev/null || true)"
 
@@ -155,18 +154,22 @@ jobs:
             mv -Tf "${TMP_LINK}" "${CURRENT_LINK}"
 
             mkdir -p "${SHARED_DIR}"
-            install -m 600 "${RUNTIME_ENV}" "${SHARED_ENV}"
 
             cd "${CURRENT_LINK}"
             pm2 reload ekat-gib --update-env || pm2 start ecosystem.config.cjs --env production
             pm2 save
-            rm -f "${ARCHIVE}" "${CHECKSUM_FILE}" "${RUNTIME_ENV}"
 
             find "${RELEASES_DIR}" -maxdepth 1 -type d -name "${APP_NAME}-*" -print \
               | sort -r \
               | tail -n +4 \
               | xargs -r rm -rf
           EOF
+        env:
+          DEPLOY_REPO_TOKEN: ${{ github.token }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_IDS: ${{ secrets.TELEGRAM_CHAT_IDS }}
+          NEXT_PUBLIC_SITE_URL: https://gibadullina-psychology.ru
+          NEXT_PUBLIC_YANDEX_METRIKA_ID: ${{ secrets.NEXT_PUBLIC_YANDEX_METRIKA_ID }}
 
       - name: Ping IndexNow
         run: curl -fsS -X POST https://servakbaza.ru/api/indexnow || true
