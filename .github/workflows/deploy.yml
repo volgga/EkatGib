@@ -84,19 +84,25 @@ jobs:
       - name: Upload deploy package
         timeout-minutes: 10
         run: |
+          set -euo pipefail
           ls -lh "ekat-gib-${GITHUB_SHA}.tar.gz" "ekat-gib-${GITHUB_SHA}.tar.gz.sha256" "ekat-gib-${GITHUB_SHA}.env"
-          scp \
-            -O \
-            -C \
-            -i ~/.ssh/deploy_key \
-            -o BatchMode=yes \
-            -o ServerAliveInterval=30 \
-            -o ServerAliveCountMax=3 \
-            -o ConnectTimeout=60 \
-            "ekat-gib-${GITHUB_SHA}.tar.gz" \
-            "ekat-gib-${GITHUB_SHA}.tar.gz.sha256" \
-            "ekat-gib-${GITHUB_SHA}.env" \
-            "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/tmp/"
+          SSH_OPTS=(
+            -i ~/.ssh/deploy_key
+            -o BatchMode=yes
+            -o ServerAliveInterval=30
+            -o ServerAliveCountMax=3
+            -o ConnectTimeout=60
+            -o Compression=yes
+          )
+          upload_file() {
+            local source_file="$1"
+            local remote_file="/tmp/$(basename "$source_file")"
+            echo "Uploading ${source_file} to ${remote_file}"
+            ssh "${SSH_OPTS[@]}" "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}" "cat > '${remote_file}'" < "${source_file}"
+          }
+          upload_file "ekat-gib-${GITHUB_SHA}.tar.gz"
+          upload_file "ekat-gib-${GITHUB_SHA}.tar.gz.sha256"
+          upload_file "ekat-gib-${GITHUB_SHA}.env"
 
       - name: Activate on VPS
         run: |
