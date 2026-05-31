@@ -78,6 +78,7 @@ jobs:
           )"
           site_url_b64="$(printf '%s' "$NEXT_PUBLIC_SITE_URL" | base64 | tr -d '\n')"
           metrika_id_b64="$(printf '%s' "$NEXT_PUBLIC_YANDEX_METRIKA_ID" | base64 | tr -d '\n')"
+          git_auth_header_b64="$(printf 'x-access-token:%s' "$DEPLOY_REPO_TOKEN" | base64 | tr -d '\n')"
 
           ssh \
             -i ~/.ssh/deploy_key \
@@ -86,7 +87,7 @@ jobs:
             -o ServerAliveCountMax=3 \
             -o ConnectTimeout=60 \
             "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}" \
-            "GITHUB_SHA='${GITHUB_SHA}' GITHUB_REF_NAME='${GITHUB_REF_NAME}' GITHUB_REPOSITORY='${GITHUB_REPOSITORY}' DEPLOY_REPO_TOKEN='${DEPLOY_REPO_TOKEN}' RUNTIME_ENV_B64='${runtime_env_b64}' NEXT_PUBLIC_SITE_URL_B64='${site_url_b64}' NEXT_PUBLIC_YANDEX_METRIKA_ID_B64='${metrika_id_b64}' bash -s" <<'EOF'
+            "GITHUB_SHA='${GITHUB_SHA}' GITHUB_REF_NAME='${GITHUB_REF_NAME}' GITHUB_REPOSITORY='${GITHUB_REPOSITORY}' GIT_AUTH_HEADER_B64='${git_auth_header_b64}' RUNTIME_ENV_B64='${runtime_env_b64}' NEXT_PUBLIC_SITE_URL_B64='${site_url_b64}' NEXT_PUBLIC_YANDEX_METRIKA_ID_B64='${metrika_id_b64}' bash -s" <<'EOF'
             set -euo pipefail
 
             APP_NAME="ekat-gib"
@@ -116,7 +117,8 @@ jobs:
             fi
 
             git -C "${SOURCE_DIR}" remote set-url origin "https://github.com/${GITHUB_REPOSITORY}.git"
-            git -C "${SOURCE_DIR}" -c http.extraheader="AUTHORIZATION: bearer ${DEPLOY_REPO_TOKEN}" fetch --force --depth=1 origin "${GITHUB_REF_NAME}"
+            git_auth_header="AUTHORIZATION: basic ${GIT_AUTH_HEADER_B64}"
+            git -C "${SOURCE_DIR}" -c http.https://github.com/.extraheader="${git_auth_header}" fetch --force --depth=1 origin "${GITHUB_REF_NAME}"
             git -C "${SOURCE_DIR}" checkout --force "${GITHUB_SHA}"
             git -C "${SOURCE_DIR}" clean -fdx
 
